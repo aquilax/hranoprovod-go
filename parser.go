@@ -9,14 +9,14 @@ import (
 )
 
 func Mytrim(s string) string{
-  return strings.Trim(s, "\t :\n");
+  return strings.Trim(s, "\t \n:");
 }
 
-func (db *NodeList) Push(node *Node){
+func (db *NodeList) Push(node Node){
   (*db)[node.name] = node;
 }
 
-func (db *NodeList) ParseFile(file_name string, callback func(node *Node)){
+func (db *NodeList) ParseFile(file_name string, callback func(node Node)){
   f, err := os.Open(file_name);
   if (err != nil) {
     log.Print(err)
@@ -25,31 +25,37 @@ func (db *NodeList) ParseFile(file_name string, callback func(node *Node)){
   input := bufio.NewReader(f)
 
   var node Node
-  node.elements = make(Elements)
+
   for {
-    line, err := input.ReadString(10)
+    line, err := input.ReadString('\n')
+
+    if err == os.EOF {
+      break
+    }
+
     if err != nil {
       log.Print(err)
-      break
+      os.Exit(2)
     }
 
     //skip empty lines
     if (line[0] == 10){
       continue
     }
-
     //new nodes start at the beginning of the line
     if(line[0] != 32 && line[0] != 8){
-      if node.name != ""{
-        if (callback != nil){
-          callback(&node);
+      if node.name != "" {
+        if (callback != nil) {
+          callback(node);
         } else {
-          db.Push(&node)
+          db.Push(node)
         }
       }
-      node.name = strings.TrimRight(line, "\t\n\r ")
+      node.name = Mytrim(line)
+      node.elements = make(Elements)
       continue
-    } 
+    }
+
     separator := strings.LastIndexAny(line, "\t ")
 
     ename := Mytrim(line[0:separator])
@@ -63,9 +69,9 @@ func (db *NodeList) ParseFile(file_name string, callback func(node *Node)){
   }
   if (node.name != ""){
     if callback != nil {
-      callback(&node)
+      callback(node)
     } else {
-      db.Push(&node);
+      db.Push(node);
     }
   }
   f.Close();

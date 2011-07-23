@@ -7,7 +7,6 @@ import (
 var options Options;
 var db NodeList;
 
-
 func main(){
   var fs = options.InitFlags();
   fs.Parse(os.Args[1:])

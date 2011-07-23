@@ -7,7 +7,6 @@ type Options struct{
   database_file_name string
 }
 
-
 type Elements map[string] float32
 
 type Node struct {
@@ -15,4 +14,4 @@ type Node struct {
   elements Elements
 }
 
-type NodeList map[string] *Node
+type NodeList map[string] Node

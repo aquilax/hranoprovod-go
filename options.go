@@ -4,7 +4,6 @@ import(
   "flag"
 )
 
-
 func (options *Options)InitFlags() *flag.FlagSet {
   var fs = flag.NewFlagSet("Options", flag.ContinueOnError)
   fs.BoolVar(&(options.help), "help", false, "Shows this message")
