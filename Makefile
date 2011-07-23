@@ -7,5 +7,6 @@ GOFILES = \
   parser.go\
   types.go\
   resolver.go\
+  processor.go\
 
 include $(GOROOT)/src/Make.cmd
