@@ -1,16 +1,29 @@
 package main
 
 import (
-//  "fmt"
+  "os"
+  "log"
 )
 
-func main(){
-  var db = make(NodeList)
-  db.ParseFile("food.yaml")
-  db.Resolve();
-//  fmt.Print(db)
+func processor(node *Node){
+  log.Print(node)
+}
 
-  var log = make(NodeList)
-  log.ParseFile("log.yaml")
-//  fmt.Print(log)
+func main(){
+  var options Options;
+  var fs = options.InitFlags();
+  fs.Parse(os.Args[1:])
+
+  if (options.help){
+    fs.PrintDefaults()
+    os.Exit(1)
+  }
+
+  var db = make(NodeList)
+  db.ParseFile(options.database_file_name, nil)
+  db.Resolve();
+
+  var mylog = make(NodeList)
+  mylog.ParseFile(options.log_file_name, processor)
+  //fmt.Print(mylog)
 }

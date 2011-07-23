@@ -12,11 +12,11 @@ func Mytrim(s string) string{
   return strings.Trim(s, "\t :\n");
 }
 
-func (db *NodeList) Push(node Node){
+func (db *NodeList) Push(node *Node){
   (*db)[node.name] = node;
 }
 
-func (db *NodeList) ParseFile(file_name string){
+func (db *NodeList) ParseFile(file_name string, callback func(node *Node)){
   f, err := os.Open(file_name);
   if (err != nil) {
     log.Print(err)
@@ -26,7 +26,6 @@ func (db *NodeList) ParseFile(file_name string){
 
   var node Node
   node.elements = make(Elements)
-
   for {
     line, err := input.ReadString(10)
     if err != nil {
@@ -42,7 +41,11 @@ func (db *NodeList) ParseFile(file_name string){
     //new nodes start at the beginning of the line
     if(line[0] != 32 && line[0] != 8){
       if node.name != ""{
-        db.Push(node)
+        if (callback != nil){
+          callback(&node);
+        } else {
+          db.Push(&node)
+        }
       }
       node.name = strings.TrimRight(line, "\t\n\r ")
       continue
@@ -59,7 +62,11 @@ func (db *NodeList) ParseFile(file_name string){
     node.elements[ename] = enum;
   }
   if (node.name != ""){
-    db.Push(node);
+    if callback != nil {
+      callback(&node)
+    } else {
+      db.Push(&node);
+    }
   }
   f.Close();
 }
