@@ -8,5 +8,6 @@ GOFILES = \
   types.go\
   resolver.go\
   processor.go\
+  accumulator.go\
 
 include $(GOROOT)/src/Make.cmd

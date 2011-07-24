@@ -2,6 +2,7 @@ package main
 
 type Options struct{
   help bool
+  totals bool
 
   log_file_name string
   database_file_name string
@@ -15,3 +16,5 @@ type Node struct {
 }
 
 type NodeList map[string] Node
+
+type Accumulator map[string] [2]float32

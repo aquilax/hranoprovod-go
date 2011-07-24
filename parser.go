@@ -39,7 +39,7 @@ func (db *NodeList) ParseFile(file_name string, callback func(node Node)){
     }
 
     //skip empty lines
-    if (line[0] == 10){
+    if (Mytrim(line) == ""){
       continue
     }
     //new nodes start at the beginning of the line
@@ -55,14 +55,15 @@ func (db *NodeList) ParseFile(file_name string, callback func(node Node)){
       node.elements = make(Elements)
       continue
     }
-
+    line = Mytrim(line)
     separator := strings.LastIndexAny(line, "\t ")
 
     ename := Mytrim(line[0:separator])
-    enum, err := strconv.Atof32(Mytrim(line[separator:]))
+    snum := Mytrim(line[separator:])
+    enum, err := strconv.Atof32(snum)
 
     if err != nil{
-      log.Println(err)
+      log.Printf("Error converting %s to float from line \"%s\". %s", snum, line, err)
       continue
     }
     node.elements[ename] = enum;
