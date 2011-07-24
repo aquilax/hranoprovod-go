@@ -32,10 +32,10 @@ func (db *NodeList) ResolveNode(name string, level int){
   var tempa = Elements{}
 
   for sname, value := range node.elements {
-   db.ResolveNode(sname, level+1)
+    db.ResolveNode(sname, level+1)
     snode, exists := (*db)[sname]
     if (exists) {
-      tempa = SumMerge(value, &tempa, &snode.elements)
+      tempa = SumMerge(value, &snode.elements, &tempa)
     } else {
       tm := make(Elements)
       tm[sname] = value;
