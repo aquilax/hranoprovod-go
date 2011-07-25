@@ -3,6 +3,7 @@ package main
 type Options struct{
   help bool
   totals bool
+  single_element string
 
   log_file_name string
   database_file_name string
