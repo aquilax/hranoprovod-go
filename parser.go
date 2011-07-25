@@ -12,11 +12,19 @@ func Mytrim(s string) string{
   return strings.Trim(s, "\t \n:");
 }
 
-func (db *NodeList) Push(node Node){
-  (*db)[node.name] = node;
+func (db *NodeList) Push(node *Node){
+  (*db)[(*node).name] = node;
 }
 
-func (db *NodeList) ParseFile(file_name string, callback func(node Node)){
+func CreateNode(name string, elements Elements) *Node{ 
+  var node Node;
+  node.name = name;
+  node.elements = elements;
+  return &node;
+}
+
+func (db *NodeList) ParseFile(file_name string, callback func(node *Node)){
+
   f, err := os.Open(file_name);
   if (err != nil) {
     log.Print(err)
@@ -24,10 +32,12 @@ func (db *NodeList) ParseFile(file_name string, callback func(node Node)){
 
   input := bufio.NewReader(f)
 
-  var node Node
+  var name string = ""
+  var elements Elements
 
   for {
-    line, err := input.ReadString('\n')
+    arr, _, err := input.ReadLine()
+    line := Mytrim(string(arr));
 
     if err == os.EOF {
       break
@@ -42,33 +52,40 @@ func (db *NodeList) ParseFile(file_name string, callback func(node Node)){
     if (Mytrim(line) == ""){
       continue
     }
+
     //new nodes start at the beginning of the line
-    if(line[0] != 32 && line[0] != 8){
-      if node.name != "" {
+    if (arr[0] != 32 && arr[0] != 8) {
+      if name != "" {
+        node := CreateNode(name, elements)
         if (callback != nil) {
           callback(node);
         } else {
           db.Push(node)
         }
       }
-      node.name = Mytrim(line)
-      node.elements = make(Elements)
+      name = line;
+      elements = make(Elements)
       continue
     }
-    line = Mytrim(line)
-    separator := strings.LastIndexAny(line, "\t ")
 
-    ename := Mytrim(line[0:separator])
-    snum := Mytrim(line[separator:])
-    enum, err := strconv.Atof32(snum)
+    if (name != ""){
+      line = Mytrim(line)
+      separator := strings.LastIndexAny(line, "\t ")
 
-    if err != nil{
-      log.Printf("Error converting %s to float from line \"%s\". %s", snum, line, err)
-      continue
+      ename := Mytrim(line[0:separator])
+      snum := Mytrim(line[separator:])
+      enum, err := strconv.Atof32(snum)
+
+      if err != nil{
+        log.Printf("Error converting %s to float from line \"%s\". %s", snum, line, err)
+        continue
+      }
+      elements[ename] = enum;
     }
-    node.elements[ename] = enum;
   }
-  if (node.name != ""){
+
+  if (name != "") {
+    node := CreateNode(name, elements)
     if callback != nil {
       callback(node)
     } else {

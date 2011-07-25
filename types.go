@@ -1,5 +1,7 @@
 package main
 
+import("fmt")
+
 type Options struct{
   help bool
   totals bool
@@ -16,6 +18,16 @@ type Node struct {
   elements Elements
 }
 
-type NodeList map[string] Node
+type NodeList map[string] *Node
 
 type Accumulator map[string] [2]float32
+
+//Used for debugging
+func (nl * NodeList) Print () {
+  for _, node := range *(nl) {
+    fmt.Println(node.name);
+    for name, val := range node.elements{
+      fmt.Printf("\t%s:%f\n", name, val)
+    }
+  }
+}

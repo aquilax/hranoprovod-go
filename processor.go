@@ -6,12 +6,12 @@ import(
   "time"
 )
 
-func processor(node Node){
+func processor(node *Node){
   if len(options.single_element) > 0 {
-    SingleProcessor(node)
+    SingleProcessor(*node)
     return
   }
-  DefaultProcessor(node)
+  DefaultProcessor(*node)
 }
 
 func SingleProcessor(node Node) {

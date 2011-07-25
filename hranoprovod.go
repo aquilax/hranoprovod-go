@@ -19,7 +19,7 @@ func main(){
   db = make(NodeList)
   db.ParseFile(options.database_file_name, nil)
   db.Resolve();
-
+  
   var mylog = make(NodeList)
   mylog.ParseFile(options.log_file_name, processor)
 }
