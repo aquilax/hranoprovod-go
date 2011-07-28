@@ -7,11 +7,38 @@ import(
 )
 
 func processor(node *Node){
+  if len(options.beginning) > 0 {
+    if !GoodDate(node.name, options.beginning, 1) {
+      return
+    }
+  }
+  if len(options.end) > 0 {
+    if !GoodDate(node.name, options.end, 2) {
+      return
+    }
+  }
   if len(options.single_element) > 0 {
     SingleProcessor(*node)
     return
   }
   DefaultProcessor(*node)
+}
+
+func ParseTime(date string) (*time.Time){
+  ts, err := time.Parse("2006/01/02", Mytrim(date));
+  if (err != nil){
+    log.Print(err)
+  }
+  return ts
+}
+
+func GoodDate(name, compare string, ctype int) bool {
+  ts := ParseTime(name)
+  tsb := ParseTime(compare)
+  if ctype ==1 {
+    return ts.Seconds() >= tsb.Seconds()
+  }
+  return ts.Seconds() <= tsb.Seconds()
 }
 
 func SingleProcessor(node Node) {
