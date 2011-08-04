@@ -80,6 +80,10 @@ func (db *NodeList) ParseFile(file_name string, callback func(node *Node)){
         log.Printf("Error converting %s to float from line \"%s\". %s", snum, line, err)
         continue
       }
+      val, exists := elements[ename]
+      if exists {
+        enum += val
+      }
       elements[ename] = enum;
     }
   }
