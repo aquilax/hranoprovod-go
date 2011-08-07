@@ -3,6 +3,7 @@ package main
 import("fmt")
 
 type Options struct{
+  version bool
   help bool
   totals bool
   single_element string
