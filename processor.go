@@ -17,6 +17,10 @@ func processor(node *Node){
       return
     }
   }
+  if options.unresolved {
+    UnresolvedProcessor(*node)
+    return;
+  }
   if len(options.single_element) > 0 {
     SingleProcessor(*node)
     return
@@ -41,6 +45,15 @@ func GoodDate(name, compare string, ctype int) bool {
   return ts.Seconds() <= tsb.Seconds()
 }
 
+func UnresolvedProcessor(node Node) {
+  for element, _ := range node.elements {
+    _, found := db[element]
+    if !found {
+      fmt.Println(element)
+    }
+  }
+}
+
 func SingleProcessor(node Node) {
   acc := make(Accumulator);
   ts, err := time.Parse("2006/01/02", Mytrim(node.name));
@@ -59,7 +72,7 @@ func SingleProcessor(node Node) {
       if element == options.single_element {
         acc.Add(element, coef)
       }
-    } 
+    }
   }
   if len(acc) > 0 {
     arr := acc[options.single_element]

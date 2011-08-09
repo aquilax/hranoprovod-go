@@ -3,6 +3,7 @@ package main
 import("fmt")
 
 type Options struct{
+  unresolved bool
   version bool
   help bool
   totals bool
