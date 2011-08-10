@@ -63,21 +63,27 @@ Example:
 ### Files
 
   -d="food.yaml": Specifies the database file name
+
   -f="log.yaml": Specifies log file name
 
 ### Filtering
+
   -b="": Beginning of date interval (YYYY/MM/DD)
+
   -e="": Ending of date interval (YYYY/MM/DD)
 
 ### Output
+
   -single="": Show only single element
+  
   -food="": Shows single food
+
   -total=true: Shows totals for each day
+
   -unresolved=false: Shows unresolved elements
 
 ### Misc
 
   -help=false: Shows this message
+
   -version=false: Shows version
-
-
