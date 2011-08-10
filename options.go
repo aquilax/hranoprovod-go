@@ -10,6 +10,7 @@ func (options *Options)InitFlags() *flag.FlagSet {
   fs.BoolVar(&(options.totals), "total", true, "Shows totals for each day")
   fs.BoolVar(&(options.version), "version", false, "Shows version")
   fs.BoolVar(&(options.unresolved), "unresolved", false, "Shows unresolved elements")
+  fs.BoolVar(&(options.csv), "csv", false, "Export in CSV format")
 
   fs.StringVar(&(options.single_food), "food", "", "Shows single food")
   fs.StringVar(&(options.single_element), "single", "", "Show only single element")

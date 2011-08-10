@@ -82,7 +82,11 @@ func SingleProcessor(node Node) {
   }
   if len(acc) > 0 {
     arr := acc[options.single_element]
-    fmt.Printf("%s %20s %10.2f %10.2f =%10.2f\n", ts.Format("2006/01/02"), options.single_element, arr[1],arr[0], arr[0]+arr[1]);
+    if options.csv {
+      fmt.Printf("%s;%s;%0.2f;%0.2f;%0.2f\n", ts.Format("2006/01/02"), options.single_element, arr[1], -1*arr[0], arr[0]+arr[1]);
+    } else {
+      fmt.Printf("%s %20s %10.2f %10.2f =%10.2f\n", ts.Format("2006/01/02"), options.single_element, arr[1],arr[0], arr[0]+arr[1]); 
+    }
   }
 }
 

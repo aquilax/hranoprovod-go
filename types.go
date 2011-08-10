@@ -7,6 +7,7 @@ type Options struct{
   version bool
   help bool
   totals bool
+  csv bool
   single_element string
   single_food string
   beginning string

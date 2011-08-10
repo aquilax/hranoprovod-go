@@ -82,6 +82,8 @@ Example:
 
   -unresolved=false: Shows unresolved elements
 
+  -csv=false: Shows data in CSV format (works only with --single)
+
 ### Misc
 
   -help=false: Shows this message
