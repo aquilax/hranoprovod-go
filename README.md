@@ -53,10 +53,10 @@ The file format is:
 
 Example:
 
-  2011/08/08:
-    walking/slow/km: 5
-    egg/boiled/pcs: 3
-    brad/slice: 1
+    2011/08/08:
+      walking/slow/km: 5
+      egg/boiled/pcs: 3
+      brad/slice: 1
 
 ## Command-line options
 
