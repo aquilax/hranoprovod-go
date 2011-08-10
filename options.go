@@ -11,6 +11,7 @@ func (options *Options)InitFlags() *flag.FlagSet {
   fs.BoolVar(&(options.version), "version", false, "Shows version")
   fs.BoolVar(&(options.unresolved), "unresolved", false, "Shows unresolved elements")
 
+  fs.StringVar(&(options.single_food), "food", "", "Shows single food")
   fs.StringVar(&(options.single_element), "single", "", "Show only single element")
   fs.StringVar(&(options.beginning), "b", "", "Beginning of date interval (YYYY/MM/DD)")
   fs.StringVar(&(options.end), "e", "", "Ending of date interval (YYYY/MM/DD)")

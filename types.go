@@ -8,6 +8,7 @@ type Options struct{
   help bool
   totals bool
   single_element string
+  single_food string
   beginning string
   end string
 

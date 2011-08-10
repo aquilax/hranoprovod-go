@@ -1,9 +1,11 @@
 package main
 
 import(
+  "os"
   "log"
   "fmt"
   "time"
+  "regexp"
 )
 
 func processor(node *Node){
@@ -23,6 +25,10 @@ func processor(node *Node){
   }
   if len(options.single_element) > 0 {
     SingleProcessor(*node)
+    return
+  }
+  if len(options.single_food) > 0 {
+    SingleFoodProcessor(*node)
     return
   }
   DefaultProcessor(*node)
@@ -77,6 +83,23 @@ func SingleProcessor(node Node) {
   if len(acc) > 0 {
     arr := acc[options.single_element]
     fmt.Printf("%s %20s %10.2f %10.2f =%10.2f\n", ts.Format("2006/01/02"), options.single_element, arr[1],arr[0], arr[0]+arr[1]);
+  }
+}
+
+func SingleFoodProcessor(node Node) {
+  ts, err := time.Parse("2006/01/02", Mytrim(node.name));
+  if (err != nil){
+    log.Print(err)
+  }
+  for element, coef := range node.elements {
+    matched, err := regexp.MatchString(options.single_food, element)
+    if err != nil {
+      log.Print(err)
+      os.Exit(3)
+    }
+    if matched {
+      fmt.Printf("%s\t%s\t%0.2f\n", ts.Format("2006/01/02"), element, coef)
+    }
   }
 }
 
