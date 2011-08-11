@@ -1,3 +1,7 @@
+#Hranoprovod
+
+Command-line life tracker.
+
 ## Description
 
 Hranoprovod is command line tracking tool. It supports recipies, which makes it 
@@ -49,6 +53,7 @@ The file format is:
       element_name2/measure_name[:] quantity
 
 [:] are optional (I use them for yaml highlight support)
+
 **Note**: The date format is (YYYY/MM/DD)
 
 Example:
