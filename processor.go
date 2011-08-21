@@ -1,6 +1,7 @@
 package main
 
 import(
+  "sort"
   "os"
   "log"
   "fmt"
@@ -129,9 +130,15 @@ func DefaultProcessor(node Node) {
     }
   }
   if options.totals {
+    var ss sort.StringSlice
     if len(acc) > 0 {
     fmt.Printf("\t%s\n", "-- TOTAL ----");
-      for name, arr := range acc{
+      for name, _ := range acc{
+        ss = append(ss, name)
+      }
+      sort.Sort(ss)
+      for _, name := range ss{
+        arr := acc[name]
         fmt.Printf("\t\t%20s %10.2f %10.2f =%10.2f\n", name, arr[1],arr[0], arr[0]+arr[1]);
       }
     }
