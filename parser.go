@@ -63,8 +63,8 @@ func (db *NodeList) ParseFile(file_name string, callback func(node *Node)){
           db.Push(node)
         }
       }
+      elements = Elements{}
       name = line;
-      elements = make(Elements)
       continue
     }
 
@@ -80,11 +80,14 @@ func (db *NodeList) ParseFile(file_name string, callback func(node *Node)){
         log.Printf("Error converting %s to float from line \"%s\". %s", snum, line, err)
         continue
       }
-      val, exists := elements[ename]
+      ndx, exists := elements.Index(ename);
       if exists {
-        enum += val
+        elements[ndx].val += enum;
       }
-      elements[ename] = enum;
+      var e Element;
+      e.name = ename
+      e.val = enum
+      elements = append(elements, e)
     }
   }
 

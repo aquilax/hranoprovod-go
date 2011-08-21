@@ -53,10 +53,10 @@ func GoodDate(name, compare string, ctype int) bool {
 }
 
 func UnresolvedProcessor(node Node) {
-  for element, _ := range node.elements {
-    _, found := db[element]
+  for _, e := range node.elements {
+    _, found := db[e.name]
     if !found {
-      fmt.Println(element)
+      fmt.Println(e.name)
     }
   }
 }
@@ -67,17 +67,17 @@ func SingleProcessor(node Node) {
   if (err != nil){
     log.Print(err)
   }
-  for element, coef := range node.elements {
-    repl, found := db[element]
+  for _, e := range node.elements {
+    repl, found := db[e.name]
     if found {
-      for repl, val := range repl.elements{
-        if repl == options.single_element {
-          acc.Add(repl, val* coef)
+      for _, repl := range repl.elements{
+        if repl.name == options.single_element {
+          acc.Add(repl.name, repl.val * e.val)
         }
       }
     } else {
-      if element == options.single_element {
-        acc.Add(element, coef)
+      if e.name == options.single_element {
+        acc.Add(e.name, e.val)
       }
     }
   }
@@ -96,14 +96,14 @@ func SingleFoodProcessor(node Node) {
   if (err != nil){
     log.Print(err)
   }
-  for element, coef := range node.elements {
-    matched, err := regexp.MatchString(options.single_food, element)
+  for _, e := range node.elements {
+    matched, err := regexp.MatchString(options.single_food, e.name)
     if err != nil {
       log.Print(err)
       os.Exit(3)
     }
     if matched {
-      fmt.Printf("%s\t%s\t%0.2f\n", ts.Format("2006/01/02"), element, coef)
+      fmt.Printf("%s\t%s\t%0.2f\n", ts.Format("2006/01/02"), e.name, e.val)
     }
   }
 }
@@ -115,18 +115,18 @@ func DefaultProcessor(node Node) {
     log.Print(err)
   }
   fmt.Printf("%s\n", ts.Format("2006/01/02"))
-  for element, coef := range node.elements {
-    fmt.Printf("\t%s : %01.2f\n", element, coef);
-    repl, found := db[element]
+  for _, e := range node.elements {
+    fmt.Printf("\t%s : %01.2f\n", e.name, e.val);
+    repl, found := db[e.name]
     if found {
-      for repl, val := range repl.elements{
-        res := val*coef;
-        fmt.Printf("\t\t%20s %10.2f\n", repl, res)
-        acc.Add(repl, res)
+      for _, repl := range repl.elements{
+        res := repl.val * e.val;
+        fmt.Printf("\t\t%20s %10.2f\n", repl.name, res)
+        acc.Add(repl.name, res)
       }
     } else  {
-      fmt.Printf("\t\t%20s %10.2f\n", element, coef)
-      acc.Add(element, coef)
+      fmt.Printf("\t\t%20s %10.2f\n", e.name, e.val)
+      acc.Add(e.name, e.val)
     }
   }
   if options.totals {

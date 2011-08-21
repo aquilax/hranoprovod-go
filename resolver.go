@@ -1,49 +1,52 @@
 package main
 
-func SumMerge(coef float32, left, right *Elements) Elements{
-  var result = Elements{};
-  for k, v := range *left {
-    _, exists := result[k];
-    if (exists){
-      result[k] += v * coef;
+
+func (els *Elements) SumMerge (left *Elements, coef float32) {
+  for _, v := range *left {
+    ndx, exists := (*els).Index(v.name)
+    if exists {
+      (*els)[ndx].val += v.val * coef
     } else {
-      result[k] = v * coef;
+      (*els).Add(v.name, v.val * coef)
     }
   }
-  for k, v := range *right{
-    _, exists := result[k];
-    if (exists){
-      result[k] += v * 1;
+/*
+  for _, v := range *right {
+    ndx, exists := (*right).Index(v.name)
+    if exists {
+      (*right)[ndx].val += v.val * 1
     } else {
-      result[k] = v * 1;
+      (*right).Add(v.name, v.val * 1)
     }
   }
-  return result
+*/
 }
 
 func (db *NodeList) ResolveNode(name string, level int){
   if (level > 9){
     return
   }
+
   node, exists := (*db)[name]
   if (!exists){
     return
   }
-  var tempa = Elements{}
 
-  for sname, value := range node.elements {
-    db.ResolveNode(sname, level+1)
-    snode, exists := (*db)[sname]
+  var nel Elements
+
+  for _, e := range node.elements {
+    db.ResolveNode(e.name, level+1)
+    snode, exists := (*db)[e.name]
     if (exists) {
-      tempa = SumMerge(value, &snode.elements, &tempa)
+      nel.SumMerge(&snode.elements, e.val)
     } else {
-      tm := make(Elements)
-      tm[sname] = value;
-      tempa = SumMerge(1, &tempa, &tm)
+      var tm Elements
+      tm.Add(e.name, e.val)
+      nel.SumMerge(&tm, 1)
     }
-    node.elements = tempa;
-    (*db)[name] = node;
   }
+  nel.Sort()
+  (*db)[name].elements = nel
 }
 
 func (db *NodeList) Resolve(){
