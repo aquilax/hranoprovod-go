@@ -10,16 +10,6 @@ func (els *Elements) SumMerge (left *Elements, coef float32) {
       (*els).Add(v.name, v.val * coef)
     }
   }
-/*
-  for _, v := range *right {
-    ndx, exists := (*right).Index(v.name)
-    if exists {
-      (*right)[ndx].val += v.val * 1
-    } else {
-      (*right).Add(v.name, v.val * 1)
-    }
-  }
-*/
 }
 
 func (db *NodeList) ResolveNode(name string, level int){

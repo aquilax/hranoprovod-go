@@ -83,11 +83,9 @@ func (db *NodeList) ParseFile(file_name string, callback func(node *Node)){
       ndx, exists := elements.Index(ename);
       if exists {
         elements[ndx].val += enum;
+      } else {
+        elements.Add(ename, enum) 
       }
-      var e Element;
-      e.name = ename
-      e.val = enum
-      elements = append(elements, e)
     }
   }
 
