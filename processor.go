@@ -7,6 +7,7 @@ import(
   "fmt"
   "time"
   "regexp"
+  "strings"
 )
 
 func processor(node *Node){
@@ -116,7 +117,7 @@ func DefaultProcessor(node Node) {
   }
   fmt.Printf("%s\n", ts.Format("2006/01/02"))
   for _, e := range node.elements {
-    fmt.Printf("\t%s : %01.2f\n", e.name, e.val);
+    fmt.Printf("\t%-27s :%10.2f\n", e.name, e.val);
     repl, found := db[e.name]
     if found {
       for _, repl := range repl.elements{
@@ -132,7 +133,7 @@ func DefaultProcessor(node Node) {
   if options.totals {
     var ss sort.StringSlice
     if len(acc) > 0 {
-    fmt.Printf("\t%s\n", "-- TOTAL ----");
+    fmt.Printf("\t-- %s %s\n", "TOTAL ", strings.Repeat("-", 52));
       for name, _ := range acc{
         ss = append(ss, name)
       }
