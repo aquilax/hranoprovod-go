@@ -30,6 +30,8 @@ func (db *NodeList) ParseFile(file_name string, callback func(node *Node)){
     log.Print(err)
   }
 
+  defer f.Close()
+
   input := bufio.NewReader(f)
 
   var name string = ""
