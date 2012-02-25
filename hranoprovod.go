@@ -5,7 +5,7 @@ import (
   "fmt"
 )
 
-const version string = "0.1"
+const version string = "0.1.1"
 
 var options Options
 var db NodeList

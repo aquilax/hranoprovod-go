@@ -37,13 +37,17 @@ type NodeList map[string] *Node
 type Accumulator map[string] [2]float32
 
 //Used for debugging
-func (nl * NodeList) Print () {
+func (nl *NodeList) Print () {
   for _, node := range *(nl) {
     fmt.Println(node.name);
     for _, e := range node.elements{
       fmt.Printf("\t%s : %0.2f\n", e.name, e.val)
     }
   }
+}
+
+func (node *Node) Print() {
+  fmt.Printf("name: %s\n", node.name)
 }
 
 func (el *Elements) Index (name string) (int, bool) {

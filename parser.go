@@ -16,26 +16,23 @@ func (db *NodeList) Push(node *Node){
   (*db)[(*node).name] = node;
 }
 
-func CreateNode(name string, elements Elements) *Node{ 
+func CreateNode() *Node{ 
   var node Node;
-  node.name = name;
-  node.elements = elements;
   return &node;
 }
 
 func (db *NodeList) ParseFile(file_name string, callback func(node *Node)){
-
   f, err := os.Open(file_name);
   if (err != nil) {
     log.Print(err)
   }
-
   defer f.Close()
 
   input := bufio.NewReader(f)
 
-  var name string = ""
-  var elements Elements
+  var line_number = 0;
+
+  var node = new(Node);
 
   for {
     arr, _, err := input.ReadLine()
@@ -50,6 +47,8 @@ func (db *NodeList) ParseFile(file_name string, callback func(node *Node)){
       os.Exit(2)
     }
 
+    line_number++
+
     //skip empty lines
     if (Mytrim(line) == ""){
       continue
@@ -57,42 +56,45 @@ func (db *NodeList) ParseFile(file_name string, callback func(node *Node)){
 
     //new nodes start at the beginning of the line
     if (arr[0] != 32 && arr[0] != 8) {
-      if name != "" {
-        node := CreateNode(name, elements)
+      if (node.name != "") {
         if (callback != nil) {
-          callback(node);
+          callback(node)
         } else {
           db.Push(node)
         }
       }
-      elements = Elements{}
-      name = line;
+      node = CreateNode()
+      node.name = line
       continue
     }
 
-    if (name != ""){
+    if (node != nil){
       line = Mytrim(line)
       separator := strings.LastIndexAny(line, "\t ")
+
+      if (separator == -1 ){
+        log.Printf("Bad syntax on line %d, \"%s\".", line_number, line)
+        os.Exit(3)
+      }
 
       ename := Mytrim(line[0:separator])
       snum := Mytrim(line[separator:])
       enum, err := strconv.Atof32(snum)
 
       if err != nil{
-        log.Printf("Error converting %s to float from line \"%s\". %s", snum, line, err)
-        continue
+        log.Printf("Error converting \"%s\" to float on line %d \"%s\".", snum, line_number, line)
+        os.Exit(4)
       }
-      ndx, exists := elements.Index(ename);
+      ndx, exists := node.elements.Index(ename);
       if exists {
-        elements[ndx].val += enum;
+        node.elements[ndx].val += enum;
       } else {
-        elements.Add(ename, enum) 
+        node.elements.Add(ename, enum) 
       }
     }
   }
 
-  if (name != "") {
-    node := CreateNode(name, elements)
+  if (node.name != "") {
     if callback != nil {
       callback(node)
     } else {
