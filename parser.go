@@ -1,105 +1,106 @@
 package main
 
 import (
-  "os"
-  "log"
-  "bufio"
-  "strings"
-  "strconv"
+	"bufio"
+	"io"
+	"log"
+	"os"
+	"strconv"
+	"strings"
 )
 
-func Mytrim(s string) string{
-  return strings.Trim(s, "\t \n:");
+func Mytrim(s string) string {
+	return strings.Trim(s, "\t \n:")
 }
 
-func (db *NodeList) Push(node *Node){
-  (*db)[(*node).name] = node;
+func (db *NodeList) Push(node *Node) {
+	(*db)[(*node).name] = node
 }
 
-func CreateNode() *Node{ 
-  var node Node;
-  return &node;
+func CreateNode() *Node {
+	var node Node
+	return &node
 }
 
-func (db *NodeList) ParseFile(file_name string, callback func(node *Node)){
-  f, err := os.Open(file_name);
-  if (err != nil) {
-    log.Print(err)
-  }
-  defer f.Close()
+func (db *NodeList) ParseFile(file_name string, callback func(node *Node)) {
+	f, err := os.Open(file_name)
+	if err != nil {
+		log.Print(err)
+	}
+	defer f.Close()
 
-  input := bufio.NewReader(f)
+	input := bufio.NewReader(f)
 
-  var line_number = 0;
+	var line_number = 0
 
-  var node = new(Node);
+	var node = new(Node)
 
-  for {
-    arr, _, err := input.ReadLine()
-    line := Mytrim(string(arr));
+	for {
+		arr, _, err := input.ReadLine()
+		line := Mytrim(string(arr))
 
-    if err == os.EOF {
-      break
-    }
+		if err == io.EOF {
+			break
+		}
 
-    if err != nil {
-      log.Print(err)
-      os.Exit(2)
-    }
+		if err != nil {
+			log.Print(err)
+			os.Exit(2)
+		}
 
-    line_number++
+		line_number++
 
-    //skip empty lines
-    if (Mytrim(line) == ""){
-      continue
-    }
+		//skip empty lines
+		if Mytrim(line) == "" {
+			continue
+		}
 
-    //new nodes start at the beginning of the line
-    if (arr[0] != 32 && arr[0] != 8) {
-      if (node.name != "") {
-        if (callback != nil) {
-          callback(node)
-        } else {
-          db.Push(node)
-        }
-      }
-      node = CreateNode()
-      node.name = line
-      continue
-    }
+		//new nodes start at the beginning of the line
+		if arr[0] != 32 && arr[0] != 8 {
+			if node.name != "" {
+				if callback != nil {
+					callback(node)
+				} else {
+					db.Push(node)
+				}
+			}
+			node = CreateNode()
+			node.name = line
+			continue
+		}
 
-    if (node != nil){
-      line = Mytrim(line)
-      separator := strings.LastIndexAny(line, "\t ")
+		if node != nil {
+			line = Mytrim(line)
+			separator := strings.LastIndexAny(line, "\t ")
 
-      if (separator == -1 ){
-        log.Printf("Bad syntax on line %d, \"%s\".", line_number, line)
-        os.Exit(3)
-      }
+			if separator == -1 {
+				log.Printf("Bad syntax on line %d, \"%s\".", line_number, line)
+				os.Exit(3)
+			}
 
-      ename := Mytrim(line[0:separator])
-      snum := Mytrim(line[separator:])
-      enum, err := strconv.Atof32(snum)
+			ename := Mytrim(line[0:separator])
+			snum := Mytrim(line[separator:])
+			enum, err := strconv.ParseFloat(snum, 32)
 
-      if err != nil{
-        log.Printf("Error converting \"%s\" to float on line %d \"%s\".", snum, line_number, line)
-        os.Exit(4)
-      }
-      ndx, exists := node.elements.Index(ename);
-      if exists {
-        node.elements[ndx].val += enum;
-      } else {
-        node.elements.Add(ename, enum) 
-      }
-    }
-  }
+			if err != nil {
+				log.Printf("Error converting \"%s\" to float on line %d \"%s\".", snum, line_number, line)
+				os.Exit(4)
+			}
+			ndx, exists := node.elements.Index(ename)
+			if exists {
+				node.elements[ndx].val += float32(enum)
+			} else {
+				node.elements.Add(ename, float32(enum))
+			}
+		}
+	}
 
-  if (node.name != "") {
-    if callback != nil {
-      callback(node)
-    } else {
-      db.Push(node);
-    }
-  }
-  f.Close();
+	if node.name != "" {
+		if callback != nil {
+			callback(node)
+		} else {
+			db.Push(node)
+		}
+	}
+	f.Close()
 }
