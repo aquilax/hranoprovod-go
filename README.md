@@ -17,8 +17,7 @@ Download the source code.
   
     git clone git://github.com/aquilax/hranoprovod-go.git
     cd hranoprovod-go
-    gomake
-    sudo gomake install
+	go build
 
 ## Requirements
 
@@ -94,3 +93,9 @@ Example:
   -help=false: Shows this message
 
   -version=false: Shows version
+
+# Changelog
+0.1.2 (2013-07-11) Added comments support in data files;
+To addd a comment start the line with # (pound sign) 
+
+0.1.1 - First stable version
