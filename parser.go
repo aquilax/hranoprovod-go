@@ -50,8 +50,8 @@ func (db *NodeList) ParseFile(file_name string, callback func(node *Node)) {
 
 		line_number++
 
-		//skip empty lines
-		if Mytrim(line) == "" {
+		//skip empty lines and lines starting with #
+		if Mytrim(line) == "" || line[0] == '#' {
 			continue
 		}
 
