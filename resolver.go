@@ -1,5 +1,7 @@
 package main
 
+const MAX_LEVEL = 9
+
 func (els *Elements) SumMerge(left *Elements, coef float32) {
 	for _, v := range *left {
 		ndx, exists := (*els).Index(v.name)
@@ -12,7 +14,7 @@ func (els *Elements) SumMerge(left *Elements, coef float32) {
 }
 
 func (db *NodeList) ResolveNode(name string, level int) {
-	if level > 9 {
+	if level > MAX_LEVEL {
 		return
 	}
 

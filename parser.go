@@ -9,6 +9,12 @@ import (
 	"strings"
 )
 
+const (
+	ERROR_IO         = 1
+	ERROR_BAD_SYNTAX = 2
+	ERROR_CONVERSION = 3
+)
+
 func Mytrim(s string) string {
 	return strings.Trim(s, "\t \n:")
 }
@@ -45,7 +51,7 @@ func (db *NodeList) ParseFile(file_name string, callback func(node *Node)) {
 
 		if err != nil {
 			log.Print(err)
-			os.Exit(2)
+			os.Exit(ERROR_IO)
 		}
 
 		line_number++
@@ -75,7 +81,7 @@ func (db *NodeList) ParseFile(file_name string, callback func(node *Node)) {
 
 			if separator == -1 {
 				log.Printf("Bad syntax on line %d, \"%s\".", line_number, line)
-				os.Exit(3)
+				os.Exit(ERROR_BAD_SYNTAX)
 			}
 
 			ename := Mytrim(line[0:separator])
@@ -84,7 +90,7 @@ func (db *NodeList) ParseFile(file_name string, callback func(node *Node)) {
 
 			if err != nil {
 				log.Printf("Error converting \"%s\" to float on line %d \"%s\".", snum, line_number, line)
-				os.Exit(4)
+				os.Exit(ERROR_CONVERSION)
 			}
 			ndx, exists := node.elements.Index(ename)
 			if exists {

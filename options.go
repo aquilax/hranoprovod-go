@@ -4,6 +4,26 @@ import (
 	"flag"
 )
 
+const (
+	DEFAULT_DB_FILENAME  = "food.yaml"
+	DEFAULT_LOG_FILENAME = "log.yaml"
+)
+
+type Options struct {
+	unresolved     bool
+	version        bool
+	help           bool
+	totals         bool
+	csv            bool
+	single_element string
+	single_food    string
+	beginning      string
+	end            string
+
+	log_file_name      string
+	database_file_name string
+}
+
 func (options *Options) InitFlags() *flag.FlagSet {
 	var fs = flag.NewFlagSet("Options", flag.ContinueOnError)
 	fs.BoolVar(&(options.help), "help", false, "Shows this message")
@@ -17,7 +37,7 @@ func (options *Options) InitFlags() *flag.FlagSet {
 	fs.StringVar(&(options.beginning), "b", "", "Beginning of date interval (YYYY/MM/DD)")
 	fs.StringVar(&(options.end), "e", "", "Ending of date interval (YYYY/MM/DD)")
 
-	fs.StringVar(&(options.log_file_name), "f", "log.yaml", "Specifies log file name")
-	fs.StringVar(&(options.database_file_name), "d", "food.yaml", "Specifies the database file name")
+	fs.StringVar(&(options.database_file_name), "d", DEFAULT_DB_FILENAME, "Specifies the database file name")
+	fs.StringVar(&(options.log_file_name), "f", DEFAULT_LOG_FILENAME, "Specifies log file name")
 	return fs
 }

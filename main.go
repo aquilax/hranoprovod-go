@@ -5,7 +5,10 @@ import (
 	"os"
 )
 
-const version string = "0.1.2"
+const (
+	VERSION = "0.1.2"
+	EXIT_OK = 0
+)
 
 var options Options
 var db NodeList
@@ -15,15 +18,15 @@ func main() {
 	fs.Parse(os.Args[1:])
 
 	if options.version {
-		fmt.Println("Hranoprovod version:", version)
-		os.Exit(1)
+		fmt.Println("Hranoprovod version:", VERSION)
+		os.Exit(EXIT_OK)
 	}
 
 	if options.help {
-		fmt.Println("Hranoprovod version:", version)
+		fmt.Println("Hranoprovod version:", VERSION)
 		fmt.Println("Usage:")
 		fs.PrintDefaults()
-		os.Exit(1)
+		os.Exit(EXIT_OK)
 	}
 
 	db = make(NodeList)
