@@ -11,7 +11,7 @@ const (
 )
 
 var options Options
-var db NodeList
+var db *NodeList
 
 func main() {
 	var fs = options.InitFlags()
@@ -29,7 +29,7 @@ func main() {
 		os.Exit(EXIT_OK)
 	}
 
-	db = make(NodeList)
+	db = NewNodeList()
 	db.ParseFile(options.database_file_name, nil)
 	db.Resolve()
 

@@ -9,6 +9,11 @@ type Node struct {
 
 type NodeList map[string]*Node
 
+func NewNodeList() *NodeList {
+	node_list := make(NodeList)
+	return &node_list
+}
+
 func (node *Node) Print() {
 	fmt.Printf("name: %s\n", node.name)
 }

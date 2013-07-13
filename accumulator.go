@@ -2,6 +2,11 @@ package main
 
 type Accumulator map[string][2]float32
 
+func NewAccumulator() *Accumulator {
+	accumulator := make(Accumulator)
+	return &accumulator
+}
+
 func (acc *Accumulator) Add(name string, val float32) {
 	ndx := 1
 	if val < 0 {
