@@ -10,9 +10,7 @@ import (
 )
 
 const (
-	ERROR_IO         = 1
-	ERROR_BAD_SYNTAX = 2
-	ERROR_CONVERSION = 3
+	COMMENT_CHAR = '#'
 )
 
 func Mytrim(s string) string {
@@ -57,7 +55,7 @@ func (db *NodeList) ParseFile(file_name string, callback func(node *Node)) {
 		line_number++
 
 		//skip empty lines and lines starting with #
-		if Mytrim(line) == "" || line[0] == '#' {
+		if Mytrim(line) == "" || line[0] == COMMENT_CHAR {
 			continue
 		}
 

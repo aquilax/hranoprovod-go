@@ -10,6 +10,11 @@ import (
 	"time"
 )
 
+const (
+	IN_DATE_FMT  = "2006/01/02"
+	OUT_DATE_FMT = "2006/01/02"
+)
+
 func processor(node *Node) {
 	if len(options.beginning) > 0 {
 		if !GoodDate(node.name, options.beginning, 1) {
@@ -37,7 +42,7 @@ func processor(node *Node) {
 }
 
 func ParseTime(date string) (time.Time, bool) {
-	ts, err := time.Parse("2006/01/02", Mytrim(date))
+	ts, err := time.Parse(IN_DATE_FMT, Mytrim(date))
 	ok := true
 	if err != nil {
 		log.Print(err)
@@ -84,9 +89,9 @@ func SingleProcessor(node Node) {
 	if len(*acc) > 0 {
 		arr := (*acc)[options.single_element]
 		if options.csv {
-			fmt.Printf("%s;%s;%0.2f;%0.2f;%0.2f\n", ts.Format("2006/01/02"), options.single_element, arr[1], -1*arr[0], arr[0]+arr[1])
+			fmt.Printf("%s;%s;%0.2f;%0.2f;%0.2f\n", ts.Format(OUT_DATE_FMT), options.single_element, arr[ACC_POS], -1*arr[ACC_NEG], arr[ACC_POS]+arr[ACC_NEG])
 		} else {
-			fmt.Printf("%s %20s %10.2f %10.2f =%10.2f\n", ts.Format("2006/01/02"), options.single_element, arr[1], arr[0], arr[0]+arr[1])
+			fmt.Printf("%s %20s %10.2f %10.2f =%10.2f\n", ts.Format(OUT_DATE_FMT), options.single_element, arr[ACC_POS], arr[ACC_NEG], arr[ACC_POS]+arr[ACC_NEG])
 		}
 	}
 }
@@ -97,10 +102,10 @@ func SingleFoodProcessor(node Node) {
 		matched, err := regexp.MatchString(options.single_food, e.name)
 		if err != nil {
 			log.Print(err)
-			os.Exit(3)
+			os.Exit(ERROR_SINGLE_FOOD_NOT_FOUND)
 		}
 		if matched {
-			fmt.Printf("%s\t%s\t%0.2f\n", ts.Format("2006/01/02"), e.name, e.val)
+			fmt.Printf("%s\t%s\t%0.2f\n", ts.Format(OUT_DATE_FMT), e.name, e.val)
 		}
 	}
 }
@@ -108,7 +113,7 @@ func SingleFoodProcessor(node Node) {
 func DefaultProcessor(node Node) {
 	acc := NewAccumulator()
 	ts, _ := ParseTime(node.name)
-	fmt.Printf("%s\n", ts.Format("2006/01/02"))
+	fmt.Printf("%s\n", ts.Format(IN_DATE_FMT))
 	for _, e := range node.elements {
 		fmt.Printf("\t%-27s :%10.2f\n", e.name, e.val)
 		repl, found := (*db)[e.name]
@@ -133,7 +138,7 @@ func DefaultProcessor(node Node) {
 			sort.Sort(ss)
 			for _, name := range ss {
 				arr := (*acc)[name]
-				fmt.Printf("\t\t%20s %10.2f %10.2f =%10.2f\n", name, arr[1], arr[0], arr[0]+arr[1])
+				fmt.Printf("\t\t%20s %10.2f %10.2f =%10.2f\n", name, arr[ACC_POS], arr[ACC_NEG], arr[ACC_POS]+arr[ACC_NEG])
 			}
 		}
 	}

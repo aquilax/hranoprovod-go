@@ -1,5 +1,10 @@
 package main
 
+const (
+	ACC_NEG = 0
+	ACC_POS = 1
+)
+
 type Accumulator map[string][2]float32
 
 func NewAccumulator() *Accumulator {
@@ -8,17 +13,17 @@ func NewAccumulator() *Accumulator {
 }
 
 func (acc *Accumulator) Add(name string, val float32) {
-	ndx := 1
+	value_sign := ACC_POS
 	if val < 0 {
-		ndx = 0
+		value_sign = ACC_NEG
 	}
 	oldval, exists := (*acc)[name]
 	if exists {
-		oldval[ndx] = val + oldval[ndx]
+		oldval[value_sign] = val + oldval[value_sign]
 		(*acc)[name] = oldval
 	} else {
 		newval := [2]float32{0, 0}
-		newval[ndx] = val
+		newval[value_sign] = val
 		(*acc)[name] = newval
 	}
 }
