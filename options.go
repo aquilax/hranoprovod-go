@@ -15,6 +15,7 @@ type Options struct {
 	help           bool
 	totals         bool
 	csv            bool
+	color          bool
 	single_element string
 	single_food    string
 	beginning      string
@@ -31,6 +32,7 @@ func (options *Options) InitFlags() *flag.FlagSet {
 	fs.BoolVar(&(options.version), "version", false, "Shows version")
 	fs.BoolVar(&(options.unresolved), "unresolved", false, "Shows unresolved elements")
 	fs.BoolVar(&(options.csv), "csv", false, "Export in CSV format")
+	fs.BoolVar(&(options.color), "color", true, "Color output")
 
 	fs.StringVar(&(options.single_food), "food", "", "Shows single food")
 	fs.StringVar(&(options.single_element), "single", "", "Show only single element")

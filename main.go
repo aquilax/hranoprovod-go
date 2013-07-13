@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	VERSION = "0.1.2"
+	VERSION = "0.1.3"
 
 	EXIT_OK = iota
 	ERROR_IO
