@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"flag"
 )
 
@@ -25,8 +26,8 @@ type Options struct {
 	database_file_name string
 }
 
-func (options *Options) InitFlags() *flag.FlagSet {
-	var fs = flag.NewFlagSet("Options", flag.ContinueOnError)
+func NewOptions(fs *flag.FlagSet) *Options {
+	var options Options
 	fs.BoolVar(&(options.help), "help", false, "Shows this message")
 	fs.BoolVar(&(options.totals), "total", true, "Shows totals for each day")
 	fs.BoolVar(&(options.version), "version", false, "Shows version")
@@ -41,5 +42,6 @@ func (options *Options) InitFlags() *flag.FlagSet {
 
 	fs.StringVar(&(options.database_file_name), "d", DEFAULT_DB_FILENAME, "Specifies the database file name")
 	fs.StringVar(&(options.log_file_name), "f", DEFAULT_LOG_FILENAME, "Specifies log file name")
-	return fs
+	fs.Parse(os.Args[1:])
+	return &options;
 }

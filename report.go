@@ -10,8 +10,16 @@ const (
 	OUT_DATE_FMT = "2006/01/02"
 )
 
-func cNum(num float32) string {
-	if options.color {
+type Reporter struct {
+	options *Options
+}
+
+func NewReporter (options *Options) *Reporter {
+	return &Reporter{options}
+}
+
+func (r *Reporter) cNum(num float32) string {
+	if r.options.color {
 		if num > 0 {
 			return red + fmt.Sprintf("%10.2f", num) + reset
 		}
@@ -22,27 +30,27 @@ func cNum(num float32) string {
 	return fmt.Sprintf("%10.2f", num)
 }
 
-func printDate(ts time.Time) {
+func (r *Reporter) printDate(ts time.Time) {
 	fmt.Printf("%s\n", ts.Format(IN_DATE_FMT))
 }
 
-func printElement(element Element) {
-	fmt.Printf("\t%-27s :%s\n", element.name, cNum(element.val))
+func (r *Reporter) printElement(element Element) {
+	fmt.Printf("\t%-27s :%s\n", element.name, r.cNum(element.val))
 }
 
-func printIngredient(name string, value float32) {
-	fmt.Printf("\t\t%20s %s\n", name, cNum(value))
+func (r *Reporter) printIngredient(name string, value float32) {
+	fmt.Printf("\t\t%20s %s\n", name, r.cNum(value))
 }
 
-func printTotalHeader() {
+func (r *Reporter) printTotalHeader() {
 	fmt.Printf("\t-- %s %s\n", "TOTAL ", strings.Repeat("-", 52))
 }
 
-func printTotalRow(name string, pos float32, neg float32) {
-	fmt.Printf("\t\t%20s %s %s =%s\n", name, cNum(pos), cNum(neg), cNum(pos+neg))
+func (r *Reporter) printTotalRow(name string, pos float32, neg float32) {
+	fmt.Printf("\t\t%20s %s %s =%s\n", name, r.cNum(pos), r.cNum(neg), r.cNum(pos+neg))
 }
 
-func printSingleElementRow(ts time.Time, name string, pos float32, neg float32, csv bool) {
+func (r *Reporter) printSingleElementRow(ts time.Time, name string, pos float32, neg float32, csv bool) {
 	format := "%s %20s %10.2f %10.2f =%10.2f\n"
 	if csv {
 		format = "%s;\"%s\";%0.2f;%0.2f;%0.2f\n"

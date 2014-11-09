@@ -26,7 +26,7 @@ func CreateNode() *Node {
 	return &node
 }
 
-func (db *NodeList) ParseFile(file_name string, callback func(node *Node)) {
+func (db *NodeList) ParseFile(file_name string, processor *Processor) {
 	f, err := os.Open(file_name)
 	if err != nil {
 		log.Print(err)
@@ -62,8 +62,8 @@ func (db *NodeList) ParseFile(file_name string, callback func(node *Node)) {
 		//new nodes start at the beginning of the line
 		if arr[0] != 32 && arr[0] != 8 {
 			if node.name != "" {
-				if callback != nil {
-					callback(node)
+				if processor != nil {
+					processor.process(node)
 				} else {
 					db.Push(node)
 				}
@@ -100,8 +100,8 @@ func (db *NodeList) ParseFile(file_name string, callback func(node *Node)) {
 	}
 
 	if node.name != "" {
-		if callback != nil {
-			callback(node)
+		if processor != nil {
+			processor.process(node)
 		} else {
 			db.Push(node)
 		}
