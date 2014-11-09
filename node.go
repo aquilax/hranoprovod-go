@@ -7,11 +7,18 @@ type Node struct {
 	elements Elements
 }
 
+func NewNode() *Node {
+	return &Node{}
+}
+
 type NodeList map[string]*Node
 
 func NewNodeList() *NodeList {
-	node_list := make(NodeList)
-	return &node_list
+	return &NodeList{}
+}
+
+func (db *NodeList) Push(node *Node) {
+	(*db)[(*node).name] = node
 }
 
 func (node *Node) Print() {

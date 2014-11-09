@@ -13,35 +13,32 @@ const (
 	COMMENT_CHAR = '#'
 )
 
-func Mytrim(s string) string {
-	return strings.Trim(s, "\t \n:")
+type Parser struct {
+	processor *Processor
 }
 
-func (db *NodeList) Push(node *Node) {
-	(*db)[(*node).name] = node
+func NewParser(processor *Processor) *Parser {
+	return &Parser{processor}
 }
 
-func CreateNode() *Node {
-	var node Node
-	return &node
-}
-
-func (db *NodeList) ParseFile(file_name string, processor *Processor) {
-	f, err := os.Open(file_name)
+func (p *Parser) parseFile(fileName string) *NodeList {
+	f, err := os.Open(fileName)
 	if err != nil {
 		log.Print(err)
 	}
 	defer f.Close()
+	return p.parseStream(bufio.NewReader(f))
+}
 
-	input := bufio.NewReader(f)
-
-	var line_number = 0
+func (p *Parser) parseStream(input *bufio.Reader) *NodeList {
+	db := NewNodeList()
+	line_number := 0
 
 	var node = new(Node)
 
 	for {
 		arr, _, err := input.ReadLine()
-		line := Mytrim(string(arr))
+		line := mytrim(string(arr))
 
 		if err == io.EOF {
 			break
@@ -55,26 +52,26 @@ func (db *NodeList) ParseFile(file_name string, processor *Processor) {
 		line_number++
 
 		//skip empty lines and lines starting with #
-		if Mytrim(line) == "" || line[0] == COMMENT_CHAR {
+		if mytrim(line) == "" || line[0] == COMMENT_CHAR {
 			continue
 		}
 
 		//new nodes start at the beginning of the line
 		if arr[0] != 32 && arr[0] != 8 {
 			if node.name != "" {
-				if processor != nil {
-					processor.process(node)
+				if p.processor != nil {
+					p.processor.process(node)
 				} else {
 					db.Push(node)
 				}
 			}
-			node = CreateNode()
+			node = NewNode()
 			node.name = line
 			continue
 		}
 
 		if node != nil {
-			line = Mytrim(line)
+			line = mytrim(line)
 			separator := strings.LastIndexAny(line, "\t ")
 
 			if separator == -1 {
@@ -82,8 +79,8 @@ func (db *NodeList) ParseFile(file_name string, processor *Processor) {
 				os.Exit(ERROR_BAD_SYNTAX)
 			}
 
-			ename := Mytrim(line[0:separator])
-			snum := Mytrim(line[separator:])
+			ename := mytrim(line[0:separator])
+			snum := mytrim(line[separator:])
 			enum, err := strconv.ParseFloat(snum, 32)
 
 			if err != nil {
@@ -100,11 +97,11 @@ func (db *NodeList) ParseFile(file_name string, processor *Processor) {
 	}
 
 	if node.name != "" {
-		if processor != nil {
-			processor.process(node)
+		if p.processor != nil {
+			p.processor.process(node)
 		} else {
 			db.Push(node)
 		}
 	}
-	f.Close()
+	return db
 }

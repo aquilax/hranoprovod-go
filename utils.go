@@ -1,5 +1,9 @@
 package main
 
+import (
+"strings"
+)
+
 const (
 	reset       = "\x1B[0m"
 	bold        = "\x1B[1m"
@@ -27,3 +31,7 @@ const (
 	bwhite      = "\x1B[47m"
 	newline     = "\r\n\x1B[0m"
 )
+
+func mytrim(s string) string {
+	return strings.Trim(s, "\t \n:")
+}

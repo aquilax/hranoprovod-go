@@ -57,7 +57,7 @@ func (p *Processor) process(node *Node) {
 }
 
 func ParseTime(date string) (time.Time, bool) {
-	ts, err := time.Parse(IN_DATE_FMT, Mytrim(date))
+	ts, err := time.Parse(IN_DATE_FMT, mytrim(date))
 	ok := true
 	if err != nil {
 		log.Print(err)
@@ -103,7 +103,7 @@ func (p *Processor) singleProcessor(node Node) {
 	}
 	if len(*acc) > 0 {
 		arr := (*acc)[p.options.single_element]
-		p.reporter.printSingleElementRow(ts, p.options.single_element, arr[ACC_POS], arr[ACC_NEG], p.options.csv)
+		p.reporter.printSingleElementRow(ts, p.options.single_element, arr[accPos], arr[accNeg], p.options.csv)
 	}
 }
 
@@ -149,7 +149,7 @@ func (p *Processor) defaultProcessor(node Node) {
 			sort.Sort(ss)
 			for _, name := range ss {
 				arr := (*acc)[name]
-				p.reporter.printTotalRow(name, arr[ACC_POS], arr[ACC_NEG])
+				p.reporter.printTotalRow(name, arr[accPos], arr[accNeg])
 			}
 		}
 	}

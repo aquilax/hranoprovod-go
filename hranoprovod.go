@@ -31,10 +31,7 @@ func (hr *Hranoprovod) run() {
 		os.Exit(EXIT_OK)
 	}
 
-	hr.db = NewNodeList()
-	hr.db.ParseFile(hr.options.database_file_name, nil)
+	hr.db = NewParser(nil).parseFile(hr.options.database_file_name)
 	NewResolver(hr.db).resolve()
-
-	var mylog = make(NodeList)
-	mylog.ParseFile(hr.options.log_file_name, NewProcessor(hr.options, hr.db))
+	NewParser(NewProcessor(hr.options, hr.db)).parseFile(hr.options.log_file_name)
 }
