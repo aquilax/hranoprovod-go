@@ -28,11 +28,11 @@ func (r *Resolver) resolveNode(name string, level int) {
 
 	var nel Elements
 
-	for _, e := range node.elements {
+	for _, e := range *node.elements {
 		r.resolveNode(e.name, level+1)
 		snode, exists := (*r.db)[e.name]
 		if exists {
-			nel.SumMerge(&snode.elements, e.val)
+			nel.SumMerge(snode.elements, e.val)
 		} else {
 			var tm Elements
 			tm.Add(e.name, e.val)
@@ -40,5 +40,5 @@ func (r *Resolver) resolveNode(name string, level int) {
 		}
 	}
 	nel.Sort()
-	(*r.db)[name].elements = nel
+	*(*r.db)[name].elements = nel
 }

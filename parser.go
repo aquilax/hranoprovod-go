@@ -21,7 +21,7 @@ func NewParser(processor *Processor) *Parser {
 	return &Parser{processor}
 }
 
-func (p *Parser) parseFile(fileName string) *NodeList {
+func (p *Parser) parseFile(fileName string) (*NodeList, error) {
 	f, err := os.Open(fileName)
 	if err != nil {
 		log.Print(err)
@@ -30,24 +30,23 @@ func (p *Parser) parseFile(fileName string) *NodeList {
 	return p.parseStream(bufio.NewReader(f))
 }
 
-func (p *Parser) parseStream(input *bufio.Reader) *NodeList {
+func (p *Parser) parseStream(input *bufio.Reader) (*NodeList, error) {
 	db := NewNodeList()
 	line_number := 0
 
-	var node = new(Node)
+	node := NewNode()
 
 	for {
-		arr, _, err := input.ReadLine()
-		line := mytrim(string(arr))
-
+		bytes, _, err := input.ReadLine()
+		// handle errors
 		if err == io.EOF {
 			break
 		}
-
 		if err != nil {
-			log.Print(err)
-			os.Exit(ERROR_IO)
+			return nil, err
 		}
+
+		line := mytrim(string(bytes))
 
 		line_number++
 
@@ -57,8 +56,8 @@ func (p *Parser) parseStream(input *bufio.Reader) *NodeList {
 		}
 
 		//new nodes start at the beginning of the line
-		if arr[0] != 32 && arr[0] != 8 {
-			if node.name != "" {
+		if bytes[0] != 32 && bytes[0] != 8 {
+			if node.header != "" {
 				if p.processor != nil {
 					p.processor.process(node)
 				} else {
@@ -66,7 +65,7 @@ func (p *Parser) parseStream(input *bufio.Reader) *NodeList {
 				}
 			}
 			node = NewNode()
-			node.name = line
+			node.header = line
 			continue
 		}
 
@@ -89,19 +88,19 @@ func (p *Parser) parseStream(input *bufio.Reader) *NodeList {
 			}
 			ndx, exists := node.elements.Index(ename)
 			if exists {
-				node.elements[ndx].val += float32(enum)
+				(*node.elements)[ndx].val += float32(enum)
 			} else {
 				node.elements.Add(ename, float32(enum))
 			}
 		}
 	}
 
-	if node.name != "" {
+	if node.header != "" {
 		if p.processor != nil {
 			p.processor.process(node)
 		} else {
 			db.Push(node)
 		}
 	}
-	return db
+	return db, nil
 }

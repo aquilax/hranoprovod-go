@@ -58,9 +58,9 @@ func (r *Reporter) printSingleElementRow(ts time.Time, name string, pos float32,
 	fmt.Printf(format, ts.Format(OUT_DATE_FMT), name, pos, -1*neg, pos+neg)
 }
 
-func printSingleFoodRow(ts time.Time, name string, val float32) {
+func (r *Reporter) printSingleFoodRow(ts time.Time, name string, val float32) {
 	fmt.Printf("%s\t%s\t%0.2f\n", ts.Format(OUT_DATE_FMT), name, val)
 }
-func printUnresolvedRow(name string) {
+func (r *Reporter) printUnresolvedRow(name string) {
 	fmt.Println(name)
 }

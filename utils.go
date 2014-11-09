@@ -1,7 +1,8 @@
 package main
 
 import (
-"strings"
+	"strings"
+	"time"
 )
 
 const (
@@ -34,4 +35,19 @@ const (
 
 func mytrim(s string) string {
 	return strings.Trim(s, "\t \n:")
+}
+
+func parseTime(date string) (time.Time, error) {
+	return time.Parse(IN_DATE_FMT, mytrim(date))
+}
+
+func isGoodDate(time, compareTime time.Time, compareType int) bool {
+	if compareType == dateStart {
+		return time.Unix() >= compareTime.Unix()
+	}
+	return time.Unix() <= compareTime.Unix()
+}
+
+func printError(err error) {
+	print(err)
 }
