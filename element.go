@@ -9,7 +9,19 @@ type Element struct {
 	val  float32
 }
 
-type Elements []Element
+type Elements []*Element
+
+func NewElement(name string, val float32) *Element {
+	return &Element{name, val}
+}
+
+func NewElements() *Elements {
+	return &Elements{}
+}
+
+func (el *Elements) Add(name string, val float32) {
+	*el = append(*el, NewElement(name, val))
+}
 
 func (el *Elements) Index(name string) (int, bool) {
 	for n, e := range *el {
@@ -18,13 +30,6 @@ func (el *Elements) Index(name string) (int, bool) {
 		}
 	}
 	return 0, false
-}
-
-func (el *Elements) Add(name string, val float32) {
-	var e Element
-	e.name = name
-	e.val = val
-	*el = append(*el, e)
 }
 
 func (els *Elements) SumMerge(left *Elements, coef float32) {

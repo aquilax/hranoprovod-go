@@ -34,7 +34,7 @@ func (r *Reporter) printDate(ts time.Time) {
 	fmt.Printf("%s\n", ts.Format(IN_DATE_FMT))
 }
 
-func (r *Reporter) printElement(element Element) {
+func (r *Reporter) printElement(element *Element) {
 	fmt.Printf("\t%-27s :%s\n", element.name, r.cNum(element.val))
 }
 
