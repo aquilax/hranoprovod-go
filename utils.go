@@ -42,10 +42,13 @@ func parseTime(date string) (time.Time, error) {
 }
 
 func isGoodDate(time, compareTime time.Time, compareType int) bool {
-	if compareType == dateStart {
-		return time.Unix() >= compareTime.Unix()
+	if time.Equal(compareTime) {
+		return true
 	}
-	return time.Unix() <= compareTime.Unix()
+	if compareType == dateBeginning {
+		return time.After(compareTime)
+	}
+	return time.Before(compareTime)
 }
 
 func printError(err error) {

@@ -8,8 +8,8 @@ import (
 const (
 	IN_DATE_FMT = "2006/01/02"
 
-	dateStart = 0
-	dateStop  = 1
+	dateBeginning = 0
+	dateEnd  = 1
 )
 
 type Processor struct {
@@ -34,7 +34,7 @@ func (p *Processor) process(node *Node) error {
 	}
 	logNode := NewLogNode(time, node.elements)
 
-	if (options.hasBeginning && !isGoodDate(logNode.time, options.beginningTime, dateStart)) || (options.hasEnd && !isGoodDate(logNode.time, options.endTime, dateStop)) {
+	if (options.hasBeginning && !isGoodDate(logNode.time, options.beginningTime, dateBeginning)) || (options.hasEnd && !isGoodDate(logNode.time, options.endTime, dateEnd)) {
 		return nil
 	}
 
