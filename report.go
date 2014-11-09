@@ -14,7 +14,7 @@ type Reporter struct {
 	options *Options
 }
 
-func NewReporter (options *Options) *Reporter {
+func NewReporter(options *Options) *Reporter {
 	return &Reporter{options}
 }
 

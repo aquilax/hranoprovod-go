@@ -2,23 +2,26 @@ package main
 
 const MAX_LEVEL = 9
 
-func (els *Elements) SumMerge(left *Elements, coef float32) {
-	for _, v := range *left {
-		ndx, exists := (*els).Index(v.name)
-		if exists {
-			(*els)[ndx].val += v.val * coef
-		} else {
-			(*els).Add(v.name, v.val*coef)
-		}
+type Resolver struct {
+	db *NodeList
+}
+
+func NewResolver(db *NodeList) *Resolver {
+	return &Resolver{db}
+}
+
+func (r *Resolver) resolve() {
+	for name, _ := range *r.db {
+		r.resolveNode(name, 0)
 	}
 }
 
-func (db *NodeList) ResolveNode(name string, level int) {
+func (r *Resolver) resolveNode(name string, level int) {
 	if level > MAX_LEVEL {
 		return
 	}
 
-	node, exists := (*db)[name]
+	node, exists := (*r.db)[name]
 	if !exists {
 		return
 	}
@@ -26,8 +29,8 @@ func (db *NodeList) ResolveNode(name string, level int) {
 	var nel Elements
 
 	for _, e := range node.elements {
-		db.ResolveNode(e.name, level+1)
-		snode, exists := (*db)[e.name]
+		r.resolveNode(e.name, level+1)
+		snode, exists := (*r.db)[e.name]
 		if exists {
 			nel.SumMerge(&snode.elements, e.val)
 		} else {
@@ -37,11 +40,5 @@ func (db *NodeList) ResolveNode(name string, level int) {
 		}
 	}
 	nel.Sort()
-	(*db)[name].elements = nel
-}
-
-func (db *NodeList) Resolve() {
-	for name, _ := range *db {
-		db.ResolveNode(name, 0)
-	}
+	(*r.db)[name].elements = nel
 }

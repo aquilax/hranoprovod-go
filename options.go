@@ -1,8 +1,8 @@
 package main
 
 import (
-	"os"
 	"flag"
+	"os"
 )
 
 const (
@@ -43,5 +43,5 @@ func NewOptions(fs *flag.FlagSet) *Options {
 	fs.StringVar(&(options.database_file_name), "d", DEFAULT_DB_FILENAME, "Specifies the database file name")
 	fs.StringVar(&(options.log_file_name), "f", DEFAULT_LOG_FILENAME, "Specifies log file name")
 	fs.Parse(os.Args[1:])
-	return &options;
+	return &options
 }

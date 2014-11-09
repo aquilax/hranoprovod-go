@@ -9,6 +9,7 @@ const (
 	ERROR_CONVERSION
 	ERROR_SINGLE_FOOD_NOT_FOUND
 )
+
 func main() {
 	NewHranoprovod().run()
 }

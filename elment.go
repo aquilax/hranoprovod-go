@@ -27,14 +27,25 @@ func (el *Elements) Add(name string, val float32) {
 	*el = append(*el, e)
 }
 
-func (s Elements) Len() int {
-	return len(s)
+func (els *Elements) SumMerge(left *Elements, coef float32) {
+	for _, v := range *left {
+		ndx, exists := (*els).Index(v.name)
+		if exists {
+			(*els)[ndx].val += v.val * coef
+		} else {
+			(*els).Add(v.name, v.val*coef)
+		}
+	}
 }
-func (s Elements) Less(i, j int) bool {
-	return s[i].name < s[j].name
+
+func (e Elements) Len() int {
+	return len(e)
 }
-func (s Elements) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
+func (e Elements) Less(i, j int) bool {
+	return e[i].name < e[j].name
+}
+func (e Elements) Swap(i, j int) {
+	e[i], e[j] = e[j], e[i]
 }
 
 func (el Elements) Sort() {

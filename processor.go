@@ -16,15 +16,15 @@ const (
 )
 
 type Processor struct {
-	options *Options
-	db *NodeList
+	options  *Options
+	db       *NodeList
 	reporter *Reporter
 }
 
 func NewProcessor(options *Options, db *NodeList) *Processor {
 	return &Processor{
-		options, 
-		db, 
+		options,
+		db,
 		NewReporter(options),
 	}
 }
