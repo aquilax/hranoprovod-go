@@ -18,11 +18,11 @@ type Processor struct {
 	reporter *Reporter
 }
 
-func NewProcessor(options *Options, db *NodeList) *Processor {
+func NewProcessor(options *Options, db *NodeList, reporter *Reporter) *Processor {
 	return &Processor{
 		options,
 		db,
-		NewReporter(options),
+		reporter,
 	}
 }
 

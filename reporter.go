@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"io"
 )
 
 const (
@@ -12,10 +13,14 @@ const (
 
 type Reporter struct {
 	options *Options
+	output io.Writer
 }
 
-func NewReporter(options *Options) *Reporter {
-	return &Reporter{options}
+func NewReporter(options *Options, writer io.Writer) *Reporter {
+	return &Reporter{
+		options,
+		writer,
+	}
 }
 
 func (r *Reporter) cNum(num float32) string {
@@ -31,23 +36,23 @@ func (r *Reporter) cNum(num float32) string {
 }
 
 func (r *Reporter) printDate(ts time.Time) {
-	fmt.Printf("%s\n", ts.Format(IN_DATE_FMT))
+	fmt.Fprintf(r.output, "%s\n", ts.Format(IN_DATE_FMT))
 }
 
 func (r *Reporter) printElement(element *Element) {
-	fmt.Printf("\t%-27s :%s\n", element.name, r.cNum(element.val))
+	fmt.Fprintf(r.output, "\t%-27s :%s\n", element.name, r.cNum(element.val))
 }
 
 func (r *Reporter) printIngredient(name string, value float32) {
-	fmt.Printf("\t\t%20s %s\n", name, r.cNum(value))
+	fmt.Fprintf(r.output, "\t\t%20s %s\n", name, r.cNum(value))
 }
 
 func (r *Reporter) printTotalHeader() {
-	fmt.Printf("\t-- %s %s\n", "TOTAL ", strings.Repeat("-", 52))
+	fmt.Fprintf(r.output, "\t-- %s %s\n", "TOTAL ", strings.Repeat("-", 52))
 }
 
 func (r *Reporter) printTotalRow(name string, pos float32, neg float32) {
-	fmt.Printf("\t\t%20s %s %s =%s\n", name, r.cNum(pos), r.cNum(neg), r.cNum(pos+neg))
+	fmt.Fprintf(r.output, "\t\t%20s %s %s =%s\n", name, r.cNum(pos), r.cNum(neg), r.cNum(pos+neg))
 }
 
 func (r *Reporter) printSingleElementRow(ts time.Time, name string, pos float32, neg float32, csv bool) {
@@ -55,12 +60,12 @@ func (r *Reporter) printSingleElementRow(ts time.Time, name string, pos float32,
 	if csv {
 		format = "%s;\"%s\";%0.2f;%0.2f;%0.2f\n"
 	}
-	fmt.Printf(format, ts.Format(OUT_DATE_FMT), name, pos, -1*neg, pos+neg)
+	fmt.Fprintf(r.output, format, ts.Format(OUT_DATE_FMT), name, pos, -1*neg, pos+neg)
 }
 
 func (r *Reporter) printSingleFoodRow(ts time.Time, name string, val float32) {
-	fmt.Printf("%s\t%s\t%0.2f\n", ts.Format(OUT_DATE_FMT), name, val)
+	fmt.Fprintf(r.output, "%s\t%s\t%0.2f\n", ts.Format(OUT_DATE_FMT), name, val)
 }
 func (r *Reporter) printUnresolvedRow(name string) {
-	fmt.Println(name)
+	fmt.Fprintln(r.output, name)
 }

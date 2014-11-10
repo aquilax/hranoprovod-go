@@ -26,7 +26,7 @@ func (r *Resolver) resolveNode(name string, level int) {
 		return
 	}
 
-	var nel Elements
+	nel := NewElements()
 
 	for _, e := range *node.elements {
 		r.resolveNode(e.name, level+1)
@@ -40,5 +40,5 @@ func (r *Resolver) resolveNode(name string, level int) {
 		}
 	}
 	nel.Sort()
-	*(*r.db)[name].elements = nel
+	(*r.db)[name].elements = nel
 }

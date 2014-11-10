@@ -39,5 +39,9 @@ func (hr *Hranoprovod) run() {
 	}
 	NewResolver(db).resolve()
 
-	NewParser(NewProcessor(options, db)).parseFile(options.logFileName)
+	NewParser(NewProcessor(
+		options, 
+		db,
+		NewReporter(options, os.Stdout),
+	)).parseFile(options.logFileName)
 }
