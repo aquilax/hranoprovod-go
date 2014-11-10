@@ -18,8 +18,7 @@ func (acc *Accumulator) Add(name string, val float32) {
 	if val < 0 {
 		sign = accNeg
 	}
-	_, exists := (*acc)[name]
-	if exists {
+	if _, exists := (*acc)[name]; exists {
 		(*acc)[name][sign] += val
 	} else {
 		newVal := &AccValue{0, 0}

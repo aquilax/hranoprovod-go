@@ -34,8 +34,7 @@ func (el *Elements) Index(name string) (int, bool) {
 
 func (els *Elements) SumMerge(left *Elements, coef float32) {
 	for _, v := range *left {
-		ndx, exists := (*els).Index(v.name)
-		if exists {
+		if ndx, exists := (*els).Index(v.name); exists {
 			(*els)[ndx].val += v.val * coef
 		} else {
 			(*els).Add(v.name, v.val*coef)
