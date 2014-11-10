@@ -13,35 +13,35 @@ func NewHranoprovod() *Hranoprovod {
 	return &Hranoprovod{}
 }
 
-func (hr *Hranoprovod) run(version string) {
+func (hr *Hranoprovod) Run(version string) error {
 	var fs = flag.NewFlagSet("Options", flag.ContinueOnError)
 	options, optionsError := NewOptions(fs)
 	if optionsError != nil {
-		printError(optionsError)
-		os.Exit(ERROR_PARSING_OPTIONS)
+		return optionsError
 	}
 
 	if options.version {
 		fmt.Println("Hranoprovod version:", version)
-		os.Exit(EXIT_OK)
+		return nil
 	}
 
 	if options.help {
 		fmt.Println("Hranoprovod version:", version)
 		fmt.Println("Usage:")
 		fs.PrintDefaults()
-		os.Exit(EXIT_OK)
+		return nil
 	}
 
-	db, error := NewParser(nil).parseFile(options.databaseFileName)
-	if error != nil {
-		os.Exit(ERROR_IO)
+	db, errp1 := NewParser(nil).parseFile(options.databaseFileName)
+	if errp1 != nil {
+		return errp1
 	}
 	NewResolver(db).resolve()
 
-	NewParser(NewProcessor(
+	_, errp2 := NewParser(NewProcessor(
 		options,
 		db,
 		NewReporter(options, os.Stdout),
 	)).parseFile(options.logFileName)
+	return errp2
 }

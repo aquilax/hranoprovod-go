@@ -1,5 +1,9 @@
 package main
 
+import (
+	"os"
+)
+
 const (
 	EXIT_OK = iota
 	ERROR_IO
@@ -8,6 +12,7 @@ const (
 	ERROR_SINGLE_FOOD_NOT_FOUND
 	ERROR_PARSING_OPTIONS
 	ERROR_OPENING_FILE
+	ERROR_GENERAL
 )
 
 type BreakingError struct {
@@ -21,4 +26,15 @@ func NewBreakingError(msg string, exitCode int) *BreakingError {
 
 func (e *BreakingError) Error() string {
 	return e.msg
+}
+
+func handleResult(err error) {
+	if err == nil {
+		os.Exit(EXIT_OK)
+	}
+	println(err)
+	if bErr, ok := err.(*BreakingError); ok {
+		os.Exit(bErr.exitCode)
+	}
+	os.Exit(ERROR_GENERAL)
 }

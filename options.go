@@ -57,14 +57,14 @@ func (o *Options) processOptions() error {
 	if len(o.beginning) > 0 {
 		o.beginningTime, err = parseTime(o.beginning)
 		if err != nil {
-			return err
+			return NewBreakingError(err.Error(), ERROR_PARSING_OPTIONS)
 		}
 		o.hasBeginning = true
 	}
 	if len(o.end) > 0 {
 		o.endTime, err = parseTime(o.end)
 		if err != nil {
-			return err
+			return NewBreakingError(err.Error(), ERROR_PARSING_OPTIONS)
 		}
 		o.hasEnd = true
 	}
