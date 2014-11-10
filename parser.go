@@ -31,10 +31,9 @@ func (p *Parser) parseFile(fileName string) (*NodeList, error) {
 }
 
 func (p *Parser) parseStream(input *bufio.Reader) (*NodeList, error) {
+	var node *Node
 	db := NewNodeList()
 	line_number := 0
-
-	node := NewNode()
 
 	for {
 		bytes, _, err := input.ReadLine()
@@ -57,15 +56,14 @@ func (p *Parser) parseStream(input *bufio.Reader) (*NodeList, error) {
 
 		//new nodes start at the beginning of the line
 		if bytes[0] != 32 && bytes[0] != 8 {
-			if node.header != "" {
+			if node != nil {
 				if p.processor != nil {
 					p.processor.process(node)
 				} else {
 					db.Push(node)
 				}
 			}
-			node = NewNode()
-			node.header = line
+			node = NewNode(line)
 			continue
 		}
 

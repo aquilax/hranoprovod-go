@@ -13,7 +13,7 @@ func NewHranoprovod() *Hranoprovod {
 	return &Hranoprovod{}
 }
 
-func (hr *Hranoprovod) run() {
+func (hr *Hranoprovod) run(version string) {
 	var fs = flag.NewFlagSet("Options", flag.ContinueOnError)
 	options, optionsError := NewOptions(fs)
 	if optionsError != nil {
@@ -22,12 +22,12 @@ func (hr *Hranoprovod) run() {
 	}
 
 	if options.version {
-		fmt.Println("Hranoprovod version:", VERSION)
+		fmt.Println("Hranoprovod version:", version)
 		os.Exit(EXIT_OK)
 	}
 
 	if options.help {
-		fmt.Println("Hranoprovod version:", VERSION)
+		fmt.Println("Hranoprovod version:", version)
 		fmt.Println("Usage:")
 		fs.PrintDefaults()
 		os.Exit(EXIT_OK)

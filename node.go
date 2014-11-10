@@ -5,9 +5,9 @@ type Node struct {
 	elements *Elements
 }
 
-func NewNode() *Node {
+func NewNode(header string) *Node {
 	return &Node{
-		"",
+		header,
 		NewElements(),
 	}
 }

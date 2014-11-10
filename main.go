@@ -1,9 +1,6 @@
 package main
 
-const (
-	VERSION = "0.1.3"
-)
-
 func main() {
-	NewHranoprovod().run()
+	version := "0.1.4"
+	NewHranoprovod().run(version)
 }
