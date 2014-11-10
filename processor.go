@@ -9,7 +9,7 @@ const (
 	IN_DATE_FMT = "2006/01/02"
 
 	dateBeginning = 0
-	dateEnd  = 1
+	dateEnd       = 1
 )
 
 type Processor struct {

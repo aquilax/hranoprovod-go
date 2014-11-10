@@ -40,7 +40,7 @@ func (hr *Hranoprovod) run() {
 	NewResolver(db).resolve()
 
 	NewParser(NewProcessor(
-		options, 
+		options,
 		db,
 		NewReporter(options, os.Stdout),
 	)).parseFile(options.logFileName)

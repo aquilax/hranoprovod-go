@@ -2,8 +2,8 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"io"
-	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -24,7 +24,7 @@ func NewParser(processor *Processor) *Parser {
 func (p *Parser) parseFile(fileName string) (*NodeList, error) {
 	f, err := os.Open(fileName)
 	if err != nil {
-		log.Print(err)
+		return nil, NewBreakingError(err.Error(), ERROR_OPENING_FILE)
 	}
 	defer f.Close()
 	return p.parseStream(bufio.NewReader(f))
@@ -43,7 +43,7 @@ func (p *Parser) parseStream(input *bufio.Reader) (*NodeList, error) {
 			break
 		}
 		if err != nil {
-			return nil, err
+			return nil, NewBreakingError(err.Error(), ERROR_IO)
 		}
 
 		line := mytrim(string(bytes))
@@ -74,8 +74,10 @@ func (p *Parser) parseStream(input *bufio.Reader) (*NodeList, error) {
 			separator := strings.LastIndexAny(line, "\t ")
 
 			if separator == -1 {
-				log.Printf("Bad syntax on line %d, \"%s\".", line_number, line)
-				os.Exit(ERROR_BAD_SYNTAX)
+				return nil, NewBreakingError(
+					fmt.Sprintf("Bad syntax on line %d, \"%s\".", line_number, line),
+					ERROR_BAD_SYNTAX,
+				)
 			}
 
 			ename := mytrim(line[0:separator])
@@ -83,8 +85,10 @@ func (p *Parser) parseStream(input *bufio.Reader) (*NodeList, error) {
 			enum, err := strconv.ParseFloat(snum, 32)
 
 			if err != nil {
-				log.Printf("Error converting \"%s\" to float on line %d \"%s\".", snum, line_number, line)
-				os.Exit(ERROR_CONVERSION)
+				return nil, NewBreakingError(
+					fmt.Sprintf("Error converting \"%s\" to float on line %d \"%s\".", snum, line_number, line),
+					ERROR_CONVERSION,
+				)
 			}
 			ndx, exists := node.elements.Index(ename)
 			if exists {

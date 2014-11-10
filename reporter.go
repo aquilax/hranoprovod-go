@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"strings"
 	"time"
-	"io"
 )
 
 const (
@@ -13,7 +13,7 @@ const (
 
 type Reporter struct {
 	options *Options
-	output io.Writer
+	output  io.Writer
 }
 
 func NewReporter(options *Options, writer io.Writer) *Reporter {
