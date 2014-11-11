@@ -18,6 +18,6 @@ func NewNodeList() *NodeList {
 	return &NodeList{}
 }
 
-func (db *NodeList) Push(node *Node) {
+func (db *NodeList) push(node *Node) {
 	(*db)[(*node).header] = node
 }

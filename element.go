@@ -19,11 +19,11 @@ func NewElements() *Elements {
 	return &Elements{}
 }
 
-func (el *Elements) Add(name string, val float32) {
+func (el *Elements) add(name string, val float32) {
 	*el = append(*el, NewElement(name, val))
 }
 
-func (el *Elements) Index(name string) (int, bool) {
+func (el *Elements) index(name string) (int, bool) {
 	for n, e := range *el {
 		if e.name == name {
 			return n, true
@@ -32,12 +32,12 @@ func (el *Elements) Index(name string) (int, bool) {
 	return 0, false
 }
 
-func (els *Elements) SumMerge(left *Elements, coef float32) {
+func (els *Elements) sumMerge(left *Elements, coef float32) {
 	for _, v := range *left {
-		if ndx, exists := (*els).Index(v.name); exists {
+		if ndx, exists := (*els).index(v.name); exists {
 			(*els)[ndx].val += v.val * coef
 		} else {
-			(*els).Add(v.name, v.val*coef)
+			(*els).add(v.name, v.val*coef)
 		}
 	}
 }

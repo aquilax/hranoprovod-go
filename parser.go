@@ -68,7 +68,7 @@ func (p *Parser) parseStream(input *bufio.Reader) (*NodeList, error) {
 				if p.processor != nil {
 					p.processor.process(node)
 				} else {
-					db.Push(node)
+					db.push(node)
 				}
 			}
 			node = NewNode(line)
@@ -96,10 +96,10 @@ func (p *Parser) parseStream(input *bufio.Reader) (*NodeList, error) {
 					ERROR_CONVERSION,
 				)
 			}
-			if ndx, exists := node.elements.Index(ename); exists {
+			if ndx, exists := node.elements.index(ename); exists {
 				(*node.elements)[ndx].val += float32(enum)
 			} else {
-				node.elements.Add(ename, float32(enum))
+				node.elements.add(ename, float32(enum))
 			}
 		}
 	}
@@ -108,7 +108,7 @@ func (p *Parser) parseStream(input *bufio.Reader) (*NodeList, error) {
 		if p.processor != nil {
 			p.processor.process(node)
 		} else {
-			db.Push(node)
+			db.push(node)
 		}
 	}
 	return db, nil

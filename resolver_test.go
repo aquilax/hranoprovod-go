@@ -9,12 +9,12 @@ func TestResolver(t *testing.T) {
 	Convey("Given nodes database and reslover", t, func() {
 		nl := NewNodeList()
 		node1 := NewNode("node1")
-		node1.elements.Add("element1", 100)
-		node1.elements.Add("element2", 200)
-		nl.Push(node1)
+		node1.elements.add("element1", 100)
+		node1.elements.add("element2", 200)
+		nl.push(node1)
 		node2 := NewNode("node2")
-		node2.elements.Add("node1", 2)
-		nl.Push(node2)
+		node2.elements.add("node1", 2)
+		nl.push(node2)
 		resolver := NewResolver(nl, 1)
 		Convey("Resolve resolves the database", func() {
 			resolver.resolve()
