@@ -9,16 +9,24 @@ import (
 	"strings"
 )
 
-const (
-	COMMENT_CHAR = '#'
-)
-
-type Parser struct {
-	processor *Processor
+type ParserOptions struct {
+	commentChar uint8
 }
 
-func NewParser(processor *Processor) *Parser {
-	return &Parser{processor}
+func NewDefaultParserOptions() *ParserOptions {
+	return &ParserOptions{'#'}
+}
+
+type Parser struct {
+	parserOptions *ParserOptions
+	processor     *Processor
+}
+
+func NewParser(parserOptions *ParserOptions, processor *Processor) *Parser {
+	return &Parser{
+		parserOptions,
+		processor,
+	}
 }
 
 func (p *Parser) parseFile(fileName string) (*NodeList, error) {
@@ -50,7 +58,7 @@ func (p *Parser) parseStream(input *bufio.Reader) (*NodeList, error) {
 		line_number++
 
 		//skip empty lines and lines starting with #
-		if mytrim(line) == "" || line[0] == COMMENT_CHAR {
+		if mytrim(line) == "" || line[0] == p.parserOptions.commentChar {
 			continue
 		}
 

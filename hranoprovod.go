@@ -36,13 +36,15 @@ func (hr *Hranoprovod) Run(version string) error {
 		return nil
 	}
 
-	db, errp1 := NewParser(nil).parseFile(options.databaseFileName)
+	parserOptions := NewDefaultParserOptions()
+
+	db, errp1 := NewParser(parserOptions, nil).parseFile(options.databaseFileName)
 	if errp1 != nil {
 		return errp1
 	}
 	NewResolver(db, resolverMaxDepth).resolve()
 
-	_, errp2 := NewParser(NewProcessor(
+	_, errp2 := NewParser(parserOptions, NewProcessor(
 		options,
 		db,
 		NewReporter(options, os.Stdout),
