@@ -1,141 +1,132 @@
 package main
 
 import (
-	"log"
-	"os"
 	"regexp"
 	"sort"
-	"time"
 )
 
 const (
 	IN_DATE_FMT = "2006/01/02"
 
-	DATE_START = 1
-	DATE_STOP  = 2
+	dateBeginning = 0
+	dateEnd       = 1
 )
 
-func processor(node *Node) {
-	if len(options.beginning) > 0 {
-		if !GoodDate(node.name, options.beginning, DATE_START) {
-			return
-		}
-	}
-	if len(options.end) > 0 {
-		if !GoodDate(node.name, options.end, DATE_STOP) {
-			return
-		}
-	}
-	if options.unresolved {
-		UnresolvedProcessor(*node)
-		return
-	}
-	if len(options.single_element) > 0 {
-		SingleProcessor(*node)
-		return
-	}
-	if len(options.single_food) > 0 {
-		SingleFoodProcessor(*node)
-		return
-	}
-	DefaultProcessor(*node)
+type Processor struct {
+	options  *Options
+	db       *NodeList
+	reporter *Reporter
 }
 
-func ParseTime(date string) (time.Time, bool) {
-	ts, err := time.Parse(IN_DATE_FMT, Mytrim(date))
-	ok := true
+func NewProcessor(options *Options, db *NodeList, reporter *Reporter) *Processor {
+	return &Processor{
+		options,
+		db,
+		reporter,
+	}
+}
+
+func (p *Processor) process(node *Node) error {
+	options := p.options
+	time, err := parseTime(node.header)
 	if err != nil {
-		log.Print(err)
-		ok = false
+		return err
 	}
-	return ts, ok
+	logNode := NewLogNode(time, node.elements)
+
+	if (options.hasBeginning && !isGoodDate(logNode.time, options.beginningTime, dateBeginning)) || (options.hasEnd && !isGoodDate(logNode.time, options.endTime, dateEnd)) {
+		return nil
+	}
+
+	if options.unresolved {
+		return p.unresolvedProcessor(logNode)
+	}
+	if len(options.singleElement) > 0 {
+		return p.singleProcessor(logNode)
+	}
+	if len(options.singleFood) > 0 {
+		return p.singleFoodProcessor(logNode)
+	}
+	return p.defaultProcessor(logNode)
+
 }
 
-func GoodDate(name, compare string, ctype int) bool {
-	ts, _ := ParseTime(name)
-	tsb, _ := ParseTime(compare)
-	if ctype == DATE_START {
-		return ts.Unix() >= tsb.Unix()
-	}
-	return ts.Unix() <= tsb.Unix()
-}
-
-func UnresolvedProcessor(node Node) {
-	for _, e := range node.elements {
-		_, found := (*db)[e.name]
+func (p *Processor) unresolvedProcessor(logNode *LogNode) error {
+	for _, e := range *logNode.elements {
+		_, found := (*p.db)[e.name]
 		if !found {
-			printUnresolvedRow(e.name)
+			p.reporter.printUnresolvedRow(e.name)
 		}
 	}
+	return nil
 }
 
-func SingleProcessor(node Node) {
+func (p *Processor) singleProcessor(logNode *LogNode) error {
 	acc := NewAccumulator()
-	ts, _ := ParseTime(node.name)
-	for _, e := range node.elements {
-		repl, found := (*db)[e.name]
+	singleElement := p.options.singleElement
+	for _, e := range *logNode.elements {
+		repl, found := (*p.db)[e.name]
 		if found {
-			for _, repl := range repl.elements {
-				if repl.name == options.single_element {
+			for _, repl := range *repl.elements {
+				if repl.name == singleElement {
 					acc.Add(repl.name, repl.val*e.val)
 				}
 			}
 		} else {
-			if e.name == options.single_element {
+			if e.name == singleElement {
 				acc.Add(e.name, e.val)
 			}
 		}
 	}
 	if len(*acc) > 0 {
-		arr := (*acc)[options.single_element]
-		printSingleElementRow(ts, options.single_element, arr[ACC_POS], arr[ACC_NEG], options.csv)
+		arr := (*acc)[singleElement]
+		p.reporter.printSingleElementRow(logNode.time, singleElement, arr[accPos], arr[accNeg], p.options.csv)
 	}
+	return nil
 }
 
-func SingleFoodProcessor(node Node) {
-	ts, _ := ParseTime(node.name)
-	for _, e := range node.elements {
-		matched, err := regexp.MatchString(options.single_food, e.name)
+func (p *Processor) singleFoodProcessor(logNode *LogNode) error {
+	for _, e := range *logNode.elements {
+		matched, err := regexp.MatchString(p.options.singleFood, e.name)
 		if err != nil {
-			log.Print(err)
-			os.Exit(ERROR_SINGLE_FOOD_NOT_FOUND)
+			return err
 		}
 		if matched {
-			printSingleFoodRow(ts, e.name, e.val)
+			p.reporter.printSingleFoodRow(logNode.time, e.name, e.val)
 		}
 	}
+	return nil
 }
 
-func DefaultProcessor(node Node) {
+func (p *Processor) defaultProcessor(logNode *LogNode) error {
 	acc := NewAccumulator()
-	ts, _ := ParseTime(node.name)
-	printDate(ts)
-	for _, element := range node.elements {
-		printElement(element)
-		repl, found := (*db)[element.name]
-		if found {
-			for _, repl := range repl.elements {
+	p.reporter.printDate(logNode.time)
+	for _, element := range *logNode.elements {
+		p.reporter.printElement(element)
+		if repl, found := (*p.db)[element.name]; found {
+			for _, repl := range *repl.elements {
 				res := repl.val * element.val
-				printIngredient(repl.name, res)
+				p.reporter.printIngredient(repl.name, res)
 				acc.Add(repl.name, res)
 			}
 		} else {
-			printIngredient(element.name, element.val)
+			p.reporter.printIngredient(element.name, element.val)
 			acc.Add(element.name, element.val)
 		}
 	}
-	if options.totals {
+	if p.options.totals {
 		var ss sort.StringSlice
 		if len(*acc) > 0 {
-			printTotalHeader()
+			p.reporter.printTotalHeader()
 			for name, _ := range *acc {
 				ss = append(ss, name)
 			}
 			sort.Sort(ss)
 			for _, name := range ss {
 				arr := (*acc)[name]
-				printTotalRow(name, arr[ACC_POS], arr[ACC_NEG])
+				p.reporter.printTotalRow(name, arr[accPos], arr[accNeg])
 			}
 		}
 	}
+	return nil
 }

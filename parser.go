@@ -2,109 +2,114 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"io"
-	"log"
 	"os"
 	"strconv"
 	"strings"
 )
 
-const (
-	COMMENT_CHAR = '#'
-)
-
-func Mytrim(s string) string {
-	return strings.Trim(s, "\t \n:")
+type ParserOptions struct {
+	commentChar uint8
 }
 
-func (db *NodeList) Push(node *Node) {
-	(*db)[(*node).name] = node
+func NewDefaultParserOptions() *ParserOptions {
+	return &ParserOptions{'#'}
 }
 
-func CreateNode() *Node {
-	var node Node
-	return &node
+type Parser struct {
+	parserOptions *ParserOptions
+	processor     *Processor
 }
 
-func (db *NodeList) ParseFile(file_name string, callback func(node *Node)) {
-	f, err := os.Open(file_name)
+func NewParser(parserOptions *ParserOptions, processor *Processor) *Parser {
+	return &Parser{
+		parserOptions,
+		processor,
+	}
+}
+
+func (p *Parser) parseFile(fileName string) (*NodeList, error) {
+	f, err := os.Open(fileName)
 	if err != nil {
-		log.Print(err)
+		return nil, NewBreakingError(err.Error(), ERROR_OPENING_FILE)
 	}
 	defer f.Close()
+	return p.parseStream(bufio.NewReader(f))
+}
 
-	input := bufio.NewReader(f)
-
-	var line_number = 0
-
-	var node = new(Node)
+func (p *Parser) parseStream(input *bufio.Reader) (*NodeList, error) {
+	var node *Node
+	db := NewNodeList()
+	line_number := 0
 
 	for {
-		arr, _, err := input.ReadLine()
-		line := Mytrim(string(arr))
-
+		bytes, _, err := input.ReadLine()
+		// handle errors
 		if err == io.EOF {
 			break
 		}
-
 		if err != nil {
-			log.Print(err)
-			os.Exit(ERROR_IO)
+			return nil, NewBreakingError(err.Error(), ERROR_IO)
 		}
+
+		line := mytrim(string(bytes))
 
 		line_number++
 
 		//skip empty lines and lines starting with #
-		if Mytrim(line) == "" || line[0] == COMMENT_CHAR {
+		if mytrim(line) == "" || line[0] == p.parserOptions.commentChar {
 			continue
 		}
 
 		//new nodes start at the beginning of the line
-		if arr[0] != 32 && arr[0] != 8 {
-			if node.name != "" {
-				if callback != nil {
-					callback(node)
+		if bytes[0] != 32 && bytes[0] != 8 {
+			if node != nil {
+				if p.processor != nil {
+					p.processor.process(node)
 				} else {
-					db.Push(node)
+					db.push(node)
 				}
 			}
-			node = CreateNode()
-			node.name = line
+			node = NewNode(line)
 			continue
 		}
 
 		if node != nil {
-			line = Mytrim(line)
+			line = mytrim(line)
 			separator := strings.LastIndexAny(line, "\t ")
 
 			if separator == -1 {
-				log.Printf("Bad syntax on line %d, \"%s\".", line_number, line)
-				os.Exit(ERROR_BAD_SYNTAX)
+				return nil, NewBreakingError(
+					fmt.Sprintf("Bad syntax on line %d, \"%s\".", line_number, line),
+					ERROR_BAD_SYNTAX,
+				)
 			}
 
-			ename := Mytrim(line[0:separator])
-			snum := Mytrim(line[separator:])
+			ename := mytrim(line[0:separator])
+			snum := mytrim(line[separator:])
 			enum, err := strconv.ParseFloat(snum, 32)
 
 			if err != nil {
-				log.Printf("Error converting \"%s\" to float on line %d \"%s\".", snum, line_number, line)
-				os.Exit(ERROR_CONVERSION)
+				return nil, NewBreakingError(
+					fmt.Sprintf("Error converting \"%s\" to float on line %d \"%s\".", snum, line_number, line),
+					ERROR_CONVERSION,
+				)
 			}
-			ndx, exists := node.elements.Index(ename)
-			if exists {
-				node.elements[ndx].val += float32(enum)
+			if ndx, exists := node.elements.index(ename); exists {
+				(*node.elements)[ndx].val += float32(enum)
 			} else {
-				node.elements.Add(ename, float32(enum))
+				node.elements.add(ename, float32(enum))
 			}
 		}
 	}
 
-	if node.name != "" {
-		if callback != nil {
-			callback(node)
+	if node != nil {
+		if p.processor != nil {
+			p.processor.process(node)
 		} else {
-			db.Push(node)
+			db.push(node)
 		}
 	}
-	f.Close()
+	return db, nil
 }

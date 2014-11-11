@@ -1,4 +1,4 @@
-#Hranoprovod
+# Hranoprovod [![Build Status](https://travis-ci.org/aquilax/hranoprovod-go.svg)](https://travis-ci.org/aquilax/hranoprovod-go)
 
 Command-line life tracker.
 

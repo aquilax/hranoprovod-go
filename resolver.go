@@ -1,47 +1,43 @@
 package main
 
-const MAX_LEVEL = 9
+type Resolver struct {
+	db       *NodeList
+	maxDepth int
+}
 
-func (els *Elements) SumMerge(left *Elements, coef float32) {
-	for _, v := range *left {
-		ndx, exists := (*els).Index(v.name)
-		if exists {
-			(*els)[ndx].val += v.val * coef
-		} else {
-			(*els).Add(v.name, v.val*coef)
-		}
+func NewResolver(db *NodeList, maxDepth int) *Resolver {
+	return &Resolver{db, maxDepth}
+}
+
+func (r *Resolver) resolve() {
+	for name, _ := range *r.db {
+		r.resolveNode(name, 0)
 	}
 }
 
-func (db *NodeList) ResolveNode(name string, level int) {
-	if level > MAX_LEVEL {
+func (r *Resolver) resolveNode(name string, level int) {
+	if level >= r.maxDepth {
 		return
 	}
 
-	node, exists := (*db)[name]
+	node, exists := (*r.db)[name]
 	if !exists {
 		return
 	}
 
-	var nel Elements
+	nel := NewElements()
 
-	for _, e := range node.elements {
-		db.ResolveNode(e.name, level+1)
-		snode, exists := (*db)[e.name]
+	for _, e := range *node.elements {
+		r.resolveNode(e.name, level+1)
+		snode, exists := (*r.db)[e.name]
 		if exists {
-			nel.SumMerge(&snode.elements, e.val)
+			nel.sumMerge(snode.elements, e.val)
 		} else {
 			var tm Elements
-			tm.Add(e.name, e.val)
-			nel.SumMerge(&tm, 1)
+			tm.add(e.name, e.val)
+			nel.sumMerge(&tm, 1)
 		}
 	}
 	nel.Sort()
-	(*db)[name].elements = nel
-}
-
-func (db *NodeList) Resolve() {
-	for name, _ := range *db {
-		db.ResolveNode(name, 0)
-	}
+	(*r.db)[name].elements = nel
 }

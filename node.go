@@ -1,29 +1,23 @@
 package main
 
-import "fmt"
-
 type Node struct {
-	name     string
-	elements Elements
+	header   string
+	elements *Elements
+}
+
+func NewNode(header string) *Node {
+	return &Node{
+		header,
+		NewElements(),
+	}
 }
 
 type NodeList map[string]*Node
 
 func NewNodeList() *NodeList {
-	node_list := make(NodeList)
-	return &node_list
+	return &NodeList{}
 }
 
-func (node *Node) Print() {
-	fmt.Printf("name: %s\n", node.name)
-}
-
-//Used for debugging
-func (nl *NodeList) Print() {
-	for _, node := range *(nl) {
-		fmt.Println(node.name)
-		for _, e := range node.elements {
-			fmt.Printf("\t%s : %0.2f\n", e.name, e.val)
-		}
-	}
+func (db *NodeList) push(node *Node) {
+	(*db)[(*node).header] = node
 }

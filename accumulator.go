@@ -1,29 +1,28 @@
 package main
 
 const (
-	ACC_NEG = 0
-	ACC_POS = 1
+	accNeg = 0
+	accPos = 1
 )
 
-type Accumulator map[string][2]float32
+type AccValue [2]float32
+
+type Accumulator map[string]*AccValue
 
 func NewAccumulator() *Accumulator {
-	accumulator := make(Accumulator)
-	return &accumulator
+	return &Accumulator{}
 }
 
 func (acc *Accumulator) Add(name string, val float32) {
-	value_sign := ACC_POS
+	sign := accPos
 	if val < 0 {
-		value_sign = ACC_NEG
+		sign = accNeg
 	}
-	oldval, exists := (*acc)[name]
-	if exists {
-		oldval[value_sign] = val + oldval[value_sign]
-		(*acc)[name] = oldval
+	if _, exists := (*acc)[name]; exists {
+		(*acc)[name][sign] += val
 	} else {
-		newval := [2]float32{0, 0}
-		newval[value_sign] = val
-		(*acc)[name] = newval
+		newVal := &AccValue{0, 0}
+		newVal[sign] = val
+		(*acc)[name] = newVal
 	}
 }
