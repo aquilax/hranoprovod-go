@@ -8,14 +8,16 @@ import (
 )
 
 const (
-	OUT_DATE_FMT = "2006/01/02"
+	outDateFormat = "2006/01/02"
 )
 
+// Reporter is the reporting structure
 type Reporter struct {
 	options *Options
 	output  io.Writer
 }
 
+// NewReporter creates new reported
 func NewReporter(options *Options, writer io.Writer) *Reporter {
 	return &Reporter{
 		options,
@@ -36,7 +38,7 @@ func (r *Reporter) cNum(num float32) string {
 }
 
 func (r *Reporter) printDate(ts time.Time) {
-	fmt.Fprintf(r.output, "%s\n", ts.Format(IN_DATE_FMT))
+	fmt.Fprintf(r.output, "%s\n", ts.Format(outDateFormat))
 }
 
 func (r *Reporter) printElement(element *Element) {
@@ -60,11 +62,11 @@ func (r *Reporter) printSingleElementRow(ts time.Time, name string, pos float32,
 	if csv {
 		format = "%s;\"%s\";%0.2f;%0.2f;%0.2f\n"
 	}
-	fmt.Fprintf(r.output, format, ts.Format(OUT_DATE_FMT), name, pos, -1*neg, pos+neg)
+	fmt.Fprintf(r.output, format, ts.Format(outDateFormat), name, pos, -1*neg, pos+neg)
 }
 
 func (r *Reporter) printSingleFoodRow(ts time.Time, name string, val float32) {
-	fmt.Fprintf(r.output, "%s\t%s\t%0.2f\n", ts.Format(OUT_DATE_FMT), name, val)
+	fmt.Fprintf(r.output, "%s\t%s\t%0.2f\n", ts.Format(outDateFormat), name, val)
 }
 func (r *Reporter) printUnresolvedRow(name string) {
 	fmt.Fprintln(r.output, name)

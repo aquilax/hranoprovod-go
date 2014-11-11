@@ -9,19 +9,23 @@ import (
 	"strings"
 )
 
+// ParserOptions contains the parser related options
 type ParserOptions struct {
 	commentChar uint8
 }
 
+// NewDefaultParserOptions returns the default set of parser options
 func NewDefaultParserOptions() *ParserOptions {
 	return &ParserOptions{'#'}
 }
 
+// Parser is the parser data structure
 type Parser struct {
 	parserOptions *ParserOptions
 	processor     *Processor
 }
 
+// NewParser returns new parser
 func NewParser(parserOptions *ParserOptions, processor *Processor) *Parser {
 	return &Parser{
 		parserOptions,
@@ -32,7 +36,7 @@ func NewParser(parserOptions *ParserOptions, processor *Processor) *Parser {
 func (p *Parser) parseFile(fileName string) (*NodeList, error) {
 	f, err := os.Open(fileName)
 	if err != nil {
-		return nil, NewBreakingError(err.Error(), ERROR_OPENING_FILE)
+		return nil, NewBreakingError(err.Error(), exitErrorOpeningFile)
 	}
 	defer f.Close()
 	return p.parseStream(bufio.NewReader(f))
@@ -41,7 +45,7 @@ func (p *Parser) parseFile(fileName string) (*NodeList, error) {
 func (p *Parser) parseStream(input *bufio.Reader) (*NodeList, error) {
 	var node *Node
 	db := NewNodeList()
-	line_number := 0
+	lineNumber := 0
 
 	for {
 		bytes, _, err := input.ReadLine()
@@ -50,12 +54,12 @@ func (p *Parser) parseStream(input *bufio.Reader) (*NodeList, error) {
 			break
 		}
 		if err != nil {
-			return nil, NewBreakingError(err.Error(), ERROR_IO)
+			return nil, NewBreakingError(err.Error(), exitErrorIO)
 		}
 
 		line := mytrim(string(bytes))
 
-		line_number++
+		lineNumber++
 
 		//skip empty lines and lines starting with #
 		if mytrim(line) == "" || line[0] == p.parserOptions.commentChar {
@@ -81,8 +85,8 @@ func (p *Parser) parseStream(input *bufio.Reader) (*NodeList, error) {
 
 			if separator == -1 {
 				return nil, NewBreakingError(
-					fmt.Sprintf("Bad syntax on line %d, \"%s\".", line_number, line),
-					ERROR_BAD_SYNTAX,
+					fmt.Sprintf("Bad syntax on line %d, \"%s\".", lineNumber, line),
+					exitErrorBadSyntax,
 				)
 			}
 
@@ -92,8 +96,8 @@ func (p *Parser) parseStream(input *bufio.Reader) (*NodeList, error) {
 
 			if err != nil {
 				return nil, NewBreakingError(
-					fmt.Sprintf("Error converting \"%s\" to float on line %d \"%s\".", snum, line_number, line),
-					ERROR_CONVERSION,
+					fmt.Sprintf("Error converting \"%s\" to float on line %d \"%s\".", snum, lineNumber, line),
+					exitErrorConversion,
 				)
 			}
 			if ndx, exists := node.elements.index(ename); exists {

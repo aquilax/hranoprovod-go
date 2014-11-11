@@ -38,7 +38,7 @@ func mytrim(s string) string {
 }
 
 func parseTime(date string) (time.Time, error) {
-	return time.Parse(IN_DATE_FMT, mytrim(date))
+	return time.Parse(inDateFormat, mytrim(date))
 }
 
 func isGoodDate(time, compareTime time.Time, compareType int) bool {

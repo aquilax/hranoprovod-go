@@ -1,16 +1,18 @@
 package main
 
+// Resolver contains the resolver data
 type Resolver struct {
 	db       *NodeList
 	maxDepth int
 }
 
+// NewResolver creates new resolver
 func NewResolver(db *NodeList, maxDepth int) *Resolver {
 	return &Resolver{db, maxDepth}
 }
 
 func (r *Resolver) resolve() {
-	for name, _ := range *r.db {
+	for name := range *r.db {
 		r.resolveNode(name, 0)
 	}
 }
