@@ -6,18 +6,20 @@ import (
 )
 
 const (
-	IN_DATE_FMT = "2006/01/02"
+	inDateFormat = "2006/01/02"
 
 	dateBeginning = 0
 	dateEnd       = 1
 )
 
+// Processor contains the processor data
 type Processor struct {
 	options  *Options
 	db       *NodeList
 	reporter *Reporter
 }
 
+// NewProcessor creates new node processor
 func NewProcessor(options *Options, db *NodeList, reporter *Reporter) *Processor {
 	return &Processor{
 		options,
@@ -69,12 +71,12 @@ func (p *Processor) singleProcessor(logNode *LogNode) error {
 		if found {
 			for _, repl := range *repl.elements {
 				if repl.name == singleElement {
-					acc.Add(repl.name, repl.val*e.val)
+					acc.add(repl.name, repl.val*e.val)
 				}
 			}
 		} else {
 			if e.name == singleElement {
-				acc.Add(e.name, e.val)
+				acc.add(e.name, e.val)
 			}
 		}
 	}
@@ -107,18 +109,18 @@ func (p *Processor) defaultProcessor(logNode *LogNode) error {
 			for _, repl := range *repl.elements {
 				res := repl.val * element.val
 				p.reporter.printIngredient(repl.name, res)
-				acc.Add(repl.name, res)
+				acc.add(repl.name, res)
 			}
 		} else {
 			p.reporter.printIngredient(element.name, element.val)
-			acc.Add(element.name, element.val)
+			acc.add(element.name, element.val)
 		}
 	}
 	if p.options.totals {
 		var ss sort.StringSlice
 		if len(*acc) > 0 {
 			p.reporter.printTotalHeader()
-			for name, _ := range *acc {
+			for name := range *acc {
 				ss = append(ss, name)
 			}
 			sort.Sort(ss)

@@ -5,15 +5,18 @@ const (
 	accPos = 1
 )
 
-type AccValue [2]float32
+// AccValues contains accumulator values
+type AccValues [2]float32
 
-type Accumulator map[string]*AccValue
+// Accumulator accumulates element values by name
+type Accumulator map[string]*AccValues
 
+// NewAccumulator returns new accumulator
 func NewAccumulator() *Accumulator {
 	return &Accumulator{}
 }
 
-func (acc *Accumulator) Add(name string, val float32) {
+func (acc *Accumulator) add(name string, val float32) {
 	sign := accPos
 	if val < 0 {
 		sign = accNeg
@@ -21,7 +24,7 @@ func (acc *Accumulator) Add(name string, val float32) {
 	if _, exists := (*acc)[name]; exists {
 		(*acc)[name][sign] += val
 	} else {
-		newVal := &AccValue{0, 0}
+		newVal := &AccValues{0, 0}
 		newVal[sign] = val
 		(*acc)[name] = newVal
 	}

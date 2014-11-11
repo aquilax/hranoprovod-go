@@ -7,10 +7,11 @@ import (
 )
 
 const (
-	DEFAULT_DB_FILENAME  = "food.yaml"
-	DEFAULT_LOG_FILENAME = "log.yaml"
+	defaultDbFilename  = "food.yaml"
+	defaultLogFilename = "log.yaml"
 )
 
+// Options contains the command line options' settings
 type Options struct {
 	unresolved       bool
 	version          bool
@@ -30,6 +31,7 @@ type Options struct {
 	databaseFileName string
 }
 
+// NewOptions parses and returns the command line options
 func NewOptions(fs *flag.FlagSet) (*Options, error) {
 	var options Options
 	fs.BoolVar(&(options.help), "help", false, "Shows this message")
@@ -44,8 +46,8 @@ func NewOptions(fs *flag.FlagSet) (*Options, error) {
 	fs.StringVar(&(options.beginning), "b", "", "Beginning of date interval (YYYY/MM/DD)")
 	fs.StringVar(&(options.end), "e", "", "Ending of date interval (YYYY/MM/DD)")
 
-	fs.StringVar(&(options.databaseFileName), "d", DEFAULT_DB_FILENAME, "Specifies the database file name")
-	fs.StringVar(&(options.logFileName), "f", DEFAULT_LOG_FILENAME, "Specifies log file name")
+	fs.StringVar(&(options.databaseFileName), "d", defaultDbFilename, "Specifies the database file name")
+	fs.StringVar(&(options.logFileName), "f", defaultLogFilename, "Specifies log file name")
 	fs.Parse(os.Args[1:])
 	return &options, options.processOptions()
 }
@@ -57,14 +59,14 @@ func (o *Options) processOptions() error {
 	if len(o.beginning) > 0 {
 		o.beginningTime, err = parseTime(o.beginning)
 		if err != nil {
-			return NewBreakingError(err.Error(), ERROR_PARSING_OPTIONS)
+			return NewBreakingError(err.Error(), exitErrorParsingOptions)
 		}
 		o.hasBeginning = true
 	}
 	if len(o.end) > 0 {
 		o.endTime, err = parseTime(o.end)
 		if err != nil {
-			return NewBreakingError(err.Error(), ERROR_PARSING_OPTIONS)
+			return NewBreakingError(err.Error(), exitErrorParsingOptions)
 		}
 		o.hasEnd = true
 	}

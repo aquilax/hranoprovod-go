@@ -10,13 +10,16 @@ const (
 	resolverMaxDepth = 9
 )
 
+// Hranoprovod is the main program structure
 type Hranoprovod struct {
 }
 
+// NewHranoprovod creates new program structure
 func NewHranoprovod() *Hranoprovod {
 	return &Hranoprovod{}
 }
 
+// Run runs the program
 func (hr *Hranoprovod) Run(version string) error {
 	var fs = flag.NewFlagSet("Options", flag.ContinueOnError)
 	options, optionsError := NewOptions(fs)
