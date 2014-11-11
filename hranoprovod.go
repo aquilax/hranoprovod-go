@@ -6,6 +6,10 @@ import (
 	"os"
 )
 
+const (
+	resolverMaxDepth = 9
+)
+
 type Hranoprovod struct {
 }
 
@@ -36,7 +40,7 @@ func (hr *Hranoprovod) Run(version string) error {
 	if errp1 != nil {
 		return errp1
 	}
-	NewResolver(db).resolve()
+	NewResolver(db, resolverMaxDepth).resolve()
 
 	_, errp2 := NewParser(NewProcessor(
 		options,

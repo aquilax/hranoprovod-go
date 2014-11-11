@@ -1,13 +1,12 @@
 package main
 
-const MAX_LEVEL = 9
-
 type Resolver struct {
-	db *NodeList
+	db       *NodeList
+	maxDepth int
 }
 
-func NewResolver(db *NodeList) *Resolver {
-	return &Resolver{db}
+func NewResolver(db *NodeList, maxDepth int) *Resolver {
+	return &Resolver{db, maxDepth}
 }
 
 func (r *Resolver) resolve() {
@@ -17,7 +16,7 @@ func (r *Resolver) resolve() {
 }
 
 func (r *Resolver) resolveNode(name string, level int) {
-	if level > MAX_LEVEL {
+	if level >= r.maxDepth {
 		return
 	}
 

@@ -103,8 +103,7 @@ func (p *Processor) defaultProcessor(logNode *LogNode) error {
 	p.reporter.printDate(logNode.time)
 	for _, element := range *logNode.elements {
 		p.reporter.printElement(element)
-		repl, found := (*p.db)[element.name]
-		if found {
+		if repl, found := (*p.db)[element.name]; found {
 			for _, repl := range *repl.elements {
 				res := repl.val * element.val
 				p.reporter.printIngredient(repl.name, res)
