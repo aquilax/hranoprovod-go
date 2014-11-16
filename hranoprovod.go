@@ -19,6 +19,20 @@ func NewHranoprovod() *Hranoprovod {
 	return &Hranoprovod{}
 }
 
+func readDatabase(parser *Parser) (*NodeList, error) {
+	nodeList := NewNodeList()
+	for {
+		select {
+		case node := <-parser.nodes:
+			nodeList.push(node)
+		case breakingError := <-parser.errors:
+			return nil, breakingError
+		case <-parser.done:
+			return nodeList, nil
+		}
+	}
+}
+
 // Run runs the program
 func (hr *Hranoprovod) Run(version string) error {
 	var fs = flag.NewFlagSet("Options", flag.ContinueOnError)
@@ -41,16 +55,30 @@ func (hr *Hranoprovod) Run(version string) error {
 
 	parserOptions := NewDefaultParserOptions()
 
-	db, errp1 := NewParser(parserOptions, nil).parseFile(options.databaseFileName)
-	if errp1 != nil {
-		return errp1
+	parser := NewParser(parserOptions)
+	go parser.parseFile(options.databaseFileName)
+	nodeList, err := readDatabase(parser)
+	if err != nil {
+		return err
 	}
-	NewResolver(db, resolverMaxDepth).resolve()
+	NewResolver(nodeList, resolverMaxDepth).resolve()
 
-	_, errp2 := NewParser(parserOptions, NewProcessor(
+	processor := NewProcessor(
 		options,
-		db,
+		nodeList,
 		NewReporter(options, os.Stdout),
-	)).parseFile(options.logFileName)
-	return errp2
+	)
+
+	go parser.parseFile(options.logFileName)
+	for {
+		select {
+		case node := <-parser.nodes:
+			processor.process(node)
+		case breakingError := <-parser.errors:
+			return breakingError
+		case <-parser.done:
+			return nil
+		}
+	}
+	return nil
 }
