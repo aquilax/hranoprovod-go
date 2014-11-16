@@ -41,16 +41,43 @@ func (hr *Hranoprovod) Run(version string) error {
 
 	parserOptions := NewDefaultParserOptions()
 
-	db, errp1 := NewParser(parserOptions, nil).parseFile(options.databaseFileName)
-	if errp1 != nil {
-		return errp1
-	}
-	NewResolver(db, resolverMaxDepth).resolve()
+	nodeList := NewNodeList()
+	parser := NewParser(parserOptions)
+	go parser.parseFile(options.databaseFileName)
+	err := func() error {
+		for {
+			select {
+			case node := <-parser.nodes:
+				nodeList.push(node)
+			case breakingError := <-parser.errors:
+				return breakingError
+			case <-parser.done:
+				return nil
+			}
+		}
+	}()
 
-	_, errp2 := NewParser(parserOptions, NewProcessor(
+	if err != nil {
+		return err
+	}
+	NewResolver(nodeList, resolverMaxDepth).resolve()
+
+	processor := NewProcessor(
 		options,
-		db,
+		nodeList,
 		NewReporter(options, os.Stdout),
-	)).parseFile(options.logFileName)
-	return errp2
+	)
+
+	go parser.parseFile(options.logFileName)
+	for {
+		select {
+		case node := <-parser.nodes:
+			processor.process(node)
+		case breakingError := <-parser.errors:
+			return breakingError
+		case <-parser.done:
+			return nil
+		}
+	}
+	return nil
 }

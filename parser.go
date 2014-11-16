@@ -22,39 +22,48 @@ func NewDefaultParserOptions() *ParserOptions {
 // Parser is the parser data structure
 type Parser struct {
 	parserOptions *ParserOptions
-	processor     *Processor
+	nodes         chan *Node
+	errors        chan *BreakingError
+	done          chan bool
 }
 
 // NewParser returns new parser
-func NewParser(parserOptions *ParserOptions, processor *Processor) *Parser {
+func NewParser(parserOptions *ParserOptions) *Parser {
 	return &Parser{
 		parserOptions,
-		processor,
+		make(chan *Node),
+		make(chan *BreakingError),
+		make(chan bool),
 	}
 }
 
-func (p *Parser) parseFile(fileName string) (*NodeList, error) {
+func (p *Parser) parseFile(fileName string) {
 	f, err := os.Open(fileName)
 	if err != nil {
-		return nil, NewBreakingError(err.Error(), exitErrorOpeningFile)
+		p.errors <- NewBreakingError(err.Error(), exitErrorOpeningFile)
+		return
 	}
 	defer f.Close()
-	return p.parseStream(bufio.NewReader(f))
+	p.parseStream(f)
 }
 
-func (p *Parser) parseStream(input *bufio.Reader) (*NodeList, error) {
+func (p *Parser) parseStream(reader io.Reader) {
 	var node *Node
-	db := NewNodeList()
 	lineNumber := 0
-
+	input := bufio.NewReader(reader)
 	for {
 		bytes, _, err := input.ReadLine()
 		// handle errors
 		if err == io.EOF {
+			// push last node
+			if node != nil {
+				p.nodes <- node
+			}
 			break
 		}
 		if err != nil {
-			return nil, NewBreakingError(err.Error(), exitErrorIO)
+			p.errors <- NewBreakingError(err.Error(), exitErrorIO)
+			return
 		}
 
 		line := mytrim(string(bytes))
@@ -69,11 +78,7 @@ func (p *Parser) parseStream(input *bufio.Reader) (*NodeList, error) {
 		//new nodes start at the beginning of the line
 		if bytes[0] != 32 && bytes[0] != 8 {
 			if node != nil {
-				if p.processor != nil {
-					p.processor.process(node)
-				} else {
-					db.push(node)
-				}
+				p.nodes <- node
 			}
 			node = NewNode(line)
 			continue
@@ -84,10 +89,11 @@ func (p *Parser) parseStream(input *bufio.Reader) (*NodeList, error) {
 			separator := strings.LastIndexAny(line, "\t ")
 
 			if separator == -1 {
-				return nil, NewBreakingError(
+				p.errors <- NewBreakingError(
 					fmt.Sprintf("Bad syntax on line %d, \"%s\".", lineNumber, line),
 					exitErrorBadSyntax,
 				)
+				return
 			}
 
 			ename := mytrim(line[0:separator])
@@ -95,10 +101,11 @@ func (p *Parser) parseStream(input *bufio.Reader) (*NodeList, error) {
 			enum, err := strconv.ParseFloat(snum, 32)
 
 			if err != nil {
-				return nil, NewBreakingError(
+				p.errors <- NewBreakingError(
 					fmt.Sprintf("Error converting \"%s\" to float on line %d \"%s\".", snum, lineNumber, line),
 					exitErrorConversion,
 				)
+				return
 			}
 			if ndx, exists := node.elements.index(ename); exists {
 				(*node.elements)[ndx].val += float32(enum)
@@ -107,13 +114,5 @@ func (p *Parser) parseStream(input *bufio.Reader) (*NodeList, error) {
 			}
 		}
 	}
-
-	if node != nil {
-		if p.processor != nil {
-			p.processor.process(node)
-		} else {
-			db.push(node)
-		}
-	}
-	return db, nil
+	p.done <- true
 }
