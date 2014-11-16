@@ -44,13 +44,13 @@ func (p *Parser) parseFile(fileName string) {
 		return
 	}
 	defer f.Close()
-	p.parseStream(bufio.NewReader(f))
+	p.parseStream(f)
 }
 
-func (p *Parser) parseStream(input *bufio.Reader) {
+func (p *Parser) parseStream(reader io.Reader) {
 	var node *Node
 	lineNumber := 0
-
+	input := bufio.NewReader(reader)
 	for {
 		bytes, _, err := input.ReadLine()
 		// handle errors
