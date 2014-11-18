@@ -36,7 +36,7 @@ func handleResult(err error) {
 	if err == nil {
 		os.Exit(exitOk)
 	}
-	println(err)
+	println(err.Error())
 	if bErr, ok := err.(*BreakingError); ok {
 		os.Exit(bErr.exitCode)
 	}
