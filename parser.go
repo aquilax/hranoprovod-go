@@ -50,43 +50,28 @@ func (p *Parser) parseFile(fileName string) {
 func (p *Parser) parseStream(reader io.Reader) {
 	var node *Node
 	lineNumber := 0
-	input := bufio.NewReader(reader)
-	for {
-		bytes, _, err := input.ReadLine()
-		// handle errors
-		if err == io.EOF {
-			// push last node
-			if node != nil {
-				p.nodes <- node
-			}
-			break
-		}
-		if err != nil {
-			p.errors <- NewBreakingError(err.Error(), exitErrorIO)
-			return
-		}
-
-		line := mytrim(string(bytes))
-
+	lineScanner := bufio.NewScanner(reader)
+	for lineScanner.Scan() {
 		lineNumber++
+		line := lineScanner.Text()
+		trimmedLine := mytrim(line)
 
 		//skip empty lines and lines starting with #
-		if mytrim(line) == "" || line[0] == p.parserOptions.commentChar {
+		if trimmedLine == "" || line[0] == p.parserOptions.commentChar {
 			continue
 		}
 
 		//new nodes start at the beginning of the line
-		if bytes[0] != 32 && bytes[0] != 8 {
+		if line[0] != ' ' && line[0] != '\t' {
 			if node != nil {
 				p.nodes <- node
 			}
-			node = NewNode(line)
+			node = NewNode(trimmedLine)
 			continue
 		}
 
 		if node != nil {
-			line = mytrim(line)
-			separator := strings.LastIndexAny(line, "\t ")
+			separator := strings.LastIndexAny(trimmedLine, "\t ")
 
 			if separator == -1 {
 				p.errors <- NewBreakingError(
@@ -95,11 +80,11 @@ func (p *Parser) parseStream(reader io.Reader) {
 				)
 				return
 			}
+			ename := mytrim(trimmedLine[0:separator])
 
-			ename := mytrim(line[0:separator])
-			snum := mytrim(line[separator:])
+			//get element value
+			snum := mytrim(trimmedLine[separator:])
 			enum, err := strconv.ParseFloat(snum, 32)
-
 			if err != nil {
 				p.errors <- NewBreakingError(
 					fmt.Sprintf("Error converting \"%s\" to float on line %d \"%s\".", snum, lineNumber, line),
@@ -107,12 +92,17 @@ func (p *Parser) parseStream(reader io.Reader) {
 				)
 				return
 			}
+
 			if ndx, exists := node.elements.index(ename); exists {
 				(*node.elements)[ndx].val += float32(enum)
 			} else {
 				node.elements.add(ename, float32(enum))
 			}
 		}
+	}
+	// push last node
+	if node != nil {
+		p.nodes <- node
 	}
 	p.done <- true
 }
