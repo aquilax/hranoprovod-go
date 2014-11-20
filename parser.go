@@ -9,6 +9,11 @@ import (
 	"strings"
 )
 
+const (
+	runeTab  = '\t'
+	runeSpace  = ' '
+)
+
 // ParserOptions contains the parser related options
 type ParserOptions struct {
 	commentChar uint8
@@ -62,7 +67,7 @@ func (p *Parser) parseStream(reader io.Reader) {
 		}
 
 		//new nodes start at the beginning of the line
-		if line[0] != ' ' && line[0] != '\t' {
+		if line[0] != runeSpace && line[0] != runeTab {
 			if node != nil {
 				p.nodes <- node
 			}
