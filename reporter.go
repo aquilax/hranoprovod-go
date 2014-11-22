@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/Hranoprovod/parser"
 	"io"
 	"strings"
 	"time"
@@ -41,8 +42,8 @@ func (r *Reporter) printDate(ts time.Time) {
 	fmt.Fprintf(r.output, "%s\n", ts.Format(outDateFormat))
 }
 
-func (r *Reporter) printElement(element *Element) {
-	fmt.Fprintf(r.output, "\t%-27s :%s\n", element.name, r.cNum(element.val))
+func (r *Reporter) printElement(element *parser.Element) {
+	fmt.Fprintf(r.output, "\t%-27s :%s\n", element.Name, r.cNum(element.Val))
 }
 
 func (r *Reporter) printIngredient(name string, value float32) {

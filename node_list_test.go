@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/Hranoprovod/parser"
 	. "github.com/smartystreets/goconvey/convey"
 	"testing"
 )
@@ -12,7 +13,7 @@ func TestNodeList(t *testing.T) {
 			So(nl != nil, ShouldBeTrue)
 		})
 		Convey("Adding new node", func() {
-			node := NewNode("test")
+			node := parser.NewNode("test")
 			nl.push(node)
 			Convey("Increases the number of nodes in the list", func() {
 				So(len(*nl), ShouldEqual, 1)

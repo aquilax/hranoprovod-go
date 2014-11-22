@@ -1,5 +1,9 @@
 package main
 
+import (
+	"github.com/Hranoprovod/parser"
+)
+
 // Resolver contains the resolver data
 type Resolver struct {
 	db       *NodeList
@@ -27,19 +31,19 @@ func (r *Resolver) resolveNode(name string, level int) {
 		return
 	}
 
-	nel := NewElements()
+	nel := parser.NewElements()
 
-	for _, e := range *node.elements {
-		r.resolveNode(e.name, level+1)
-		snode, exists := (*r.db)[e.name]
+	for _, e := range *node.Elements {
+		r.resolveNode(e.Name, level+1)
+		snode, exists := (*r.db)[e.Name]
 		if exists {
-			nel.sumMerge(snode.elements, e.val)
+			nel.SumMerge(snode.Elements, e.Val)
 		} else {
-			var tm Elements
-			tm.add(e.name, e.val)
-			nel.sumMerge(&tm, 1)
+			var tm parser.Elements
+			tm.Add(e.Name, e.Val)
+			nel.SumMerge(&tm, 1)
 		}
 	}
 	nel.Sort()
-	(*r.db)[name].elements = nel
+	(*r.db)[name].Elements = nel
 }

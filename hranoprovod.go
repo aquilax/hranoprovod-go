@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/Hranoprovod/parser"
 	"os"
 )
 
@@ -39,19 +40,17 @@ func (hr *Hranoprovod) Run(version string) error {
 		return nil
 	}
 
-	parserOptions := NewDefaultParserOptions()
-
 	nodeList := NewNodeList()
-	parser := NewParser(parserOptions)
-	go parser.parseFile(options.databaseFileName)
+	prsr := parser.NewParser(parser.NewDefaultOptions())
+	go prsr.ParseFile(options.databaseFileName)
 	err := func() error {
 		for {
 			select {
-			case node := <-parser.nodes:
+			case node := <-prsr.Nodes:
 				nodeList.push(node)
-			case breakingError := <-parser.errors:
+			case breakingError := <-prsr.Errors:
 				return breakingError
-			case <-parser.done:
+			case <-prsr.Done:
 				return nil
 			}
 		}
@@ -68,14 +67,14 @@ func (hr *Hranoprovod) Run(version string) error {
 		NewReporter(options, os.Stdout),
 	)
 
-	go parser.parseFile(options.logFileName)
+	go prsr.ParseFile(options.logFileName)
 	for {
 		select {
-		case node := <-parser.nodes:
+		case node := <-prsr.Nodes:
 			processor.process(node)
-		case breakingError := <-parser.errors:
+		case breakingError := <-prsr.Errors:
 			return breakingError
-		case <-parser.done:
+		case <-prsr.Done:
 			return nil
 		}
 	}

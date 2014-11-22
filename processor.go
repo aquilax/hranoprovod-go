@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/Hranoprovod/parser"
 	"regexp"
 	"sort"
 )
@@ -28,13 +29,13 @@ func NewProcessor(options *Options, db *NodeList, reporter *Reporter) *Processor
 	}
 }
 
-func (p *Processor) process(node *Node) error {
+func (p *Processor) process(node *parser.Node) error {
 	options := p.options
-	time, err := parseTime(node.header)
+	time, err := parseTime(node.Header)
 	if err != nil {
 		return err
 	}
-	logNode := NewLogNode(time, node.elements)
+	logNode := NewLogNode(time, node.Elements)
 
 	if (options.hasBeginning && !isGoodDate(logNode.time, options.beginningTime, dateBeginning)) || (options.hasEnd && !isGoodDate(logNode.time, options.endTime, dateEnd)) {
 		return nil
@@ -55,9 +56,9 @@ func (p *Processor) process(node *Node) error {
 
 func (p *Processor) unresolvedProcessor(logNode *LogNode) error {
 	for _, e := range *logNode.elements {
-		_, found := (*p.db)[e.name]
+		_, found := (*p.db)[e.Name]
 		if !found {
-			p.reporter.printUnresolvedRow(e.name)
+			p.reporter.printUnresolvedRow(e.Name)
 		}
 	}
 	return nil
@@ -67,16 +68,16 @@ func (p *Processor) singleProcessor(logNode *LogNode) error {
 	acc := NewAccumulator()
 	singleElement := p.options.singleElement
 	for _, e := range *logNode.elements {
-		repl, found := (*p.db)[e.name]
+		repl, found := (*p.db)[e.Name]
 		if found {
-			for _, repl := range *repl.elements {
-				if repl.name == singleElement {
-					acc.add(repl.name, repl.val*e.val)
+			for _, repl := range *repl.Elements {
+				if repl.Name == singleElement {
+					acc.add(repl.Name, repl.Val*e.Val)
 				}
 			}
 		} else {
-			if e.name == singleElement {
-				acc.add(e.name, e.val)
+			if e.Name == singleElement {
+				acc.add(e.Name, e.Val)
 			}
 		}
 	}
@@ -89,12 +90,12 @@ func (p *Processor) singleProcessor(logNode *LogNode) error {
 
 func (p *Processor) singleFoodProcessor(logNode *LogNode) error {
 	for _, e := range *logNode.elements {
-		matched, err := regexp.MatchString(p.options.singleFood, e.name)
+		matched, err := regexp.MatchString(p.options.singleFood, e.Name)
 		if err != nil {
 			return err
 		}
 		if matched {
-			p.reporter.printSingleFoodRow(logNode.time, e.name, e.val)
+			p.reporter.printSingleFoodRow(logNode.time, e.Name, e.Val)
 		}
 	}
 	return nil
@@ -105,15 +106,15 @@ func (p *Processor) defaultProcessor(logNode *LogNode) error {
 	p.reporter.printDate(logNode.time)
 	for _, element := range *logNode.elements {
 		p.reporter.printElement(element)
-		if repl, found := (*p.db)[element.name]; found {
-			for _, repl := range *repl.elements {
-				res := repl.val * element.val
-				p.reporter.printIngredient(repl.name, res)
-				acc.add(repl.name, res)
+		if repl, found := (*p.db)[element.Name]; found {
+			for _, repl := range *repl.Elements {
+				res := repl.Val * element.Val
+				p.reporter.printIngredient(repl.Name, res)
+				acc.add(repl.Name, res)
 			}
 		} else {
-			p.reporter.printIngredient(element.name, element.val)
-			acc.add(element.name, element.val)
+			p.reporter.printIngredient(element.Name, element.Val)
+			acc.add(element.Name, element.Val)
 		}
 	}
 	if p.options.totals {
