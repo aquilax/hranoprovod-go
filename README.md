@@ -1,5 +1,7 @@
 # Hranoprovod [![Build Status](https://travis-ci.org/aquilax/hranoprovod-go.svg)](https://travis-ci.org/aquilax/hranoprovod-go)
 
+Note: This is the legacy verion of the tool and as such, must be treated as deprecated. The new version can be found [here](https://github.com/Hranoprovod/hranoprovod-cli)
+
 Command-line life tracker.
 
 ## Description
